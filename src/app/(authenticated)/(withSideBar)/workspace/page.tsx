@@ -1,7 +1,136 @@
+"use client"
+
+import { Button } from "@/components/ui/button"
+import { Church } from "lucide-react"
+import Image from "next/image"
+import Link from "next/link"
+
 const WorkSpace = () => {
     return (
-        <div>
-            Workspace
+        <div className="flex flex-col gap-6">
+            <header className="text-[32px] font-semibold text-[#878A9399]">Good morning, <span className="text-[#1A1A1A]">Tolu</span></header>
+
+            <div className="flex flex-col gap-4">
+                <div className="flex items-center justify-between">
+                    <span className="font-semibold text-[#878A93] text-base">Active Projects</span>
+                    <Button className="text-white bg-primary rounded-[14px] hover:bg-primary-hover hover:text-black">start a new project</Button>
+                </div>
+                <div className="grid grid-cols-3 gap-3">
+                    <div className="p-4 gap-3 rounded-3xl bg-[#FBFCFC] flex flex-col">
+                        <div className="top w-full flex items-center gap-3 pb-3">
+                            <div className="bg-[#D1F7FF] flex items-center justify-center p-[5.84px] text-[#1A1A1A] text-xs h-[54px] rounded-[11.68px]">BlueMart</div>
+                            <div className="flex flex-col gap-2">
+                                <span className="text-sm font-medium text-[#121217]">Essential Growth Project</span>
+                                <div className="items-center gap-2 flex">
+                                    <span className="flex items-center gap-[2px] text-sm text-[#878A93]">
+                                        <Church className="w-4 h-4" />
+                                        Status: <span className="text-[#121217] font-light">In progress</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="p-4 flex flex-col gap-2 border border-[#D1DAEC80] rounded-[14px]">
+                            <span className="text-[#1A1A1A] text-sm font-normal">Upcoming Deliverables</span>
+                            <span className="text-sm text-[#727374]">Funnel Audit</span>
+                            <span className="text-sm text-[#727374]">Strategy Development  </span>
+                            <span className="text-sm text-[#727374]">Execution & Support</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                            <Image src={'/images/scalepadi-ai-logo.svg'} alt="Scalepadi AI logo" width={147} height={36} />
+                            <Link href={'/workspace/1'}>
+                                <Button variant={'outline'} className="text-xs">View workspace</Button>
+                            </Link>
+                        </div>
+                    </div>
+                    <div className="p-4 gap-3 rounded-3xl bg-[#FBFCFC] flex flex-col">
+                        <div className="top w-full flex items-center gap-3 pb-3">
+                            <div className="bg-[#D1F7FF] flex items-center justify-center p-[5.84px] text-[#1A1A1A] text-xs h-[54px] rounded-[11.68px]">BlueMart</div>
+                            <div className="flex flex-col gap-2">
+                                <span className="text-sm font-medium text-[#121217]">Essential Growth Project</span>
+                                <div className="items-center gap-2 flex">
+                                    <span className="flex items-center gap-[2px] text-sm text-[#878A93]">
+                                        <Church className="w-4 h-4" />
+                                        Status: <span className="text-[#121217] font-light">In progress</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="p-4 flex flex-col gap-2 border border-[#D1DAEC80] rounded-[14px]">
+                            <span className="text-[#1A1A1A] text-sm font-normal">Upcoming Deliverables</span>
+                            <span className="text-sm text-[#727374]">Funnel Audit</span>
+                            <span className="text-sm text-[#727374]">Strategy Development  </span>
+                            <span className="text-sm text-[#727374]">Execution & Support</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                            <Image src={'/images/scalepadi-ai-logo.svg'} alt="Scalepadi AI logo" width={147} height={36} />
+                            <Link href={'/workspace/1'}>
+                                <Button variant={'outline'} className="text-xs">View workspace</Button>
+                            </Link>
+                        </div>
+                    </div>
+                    <div className="p-4 gap-3 rounded-3xl bg-[#FBFCFC] flex flex-col">
+                        <div className="top w-full flex items-center gap-3 pb-3">
+                            <div className="bg-[#D1F7FF] flex items-center justify-center p-[5.84px] text-[#1A1A1A] text-xs h-[54px] rounded-[11.68px]">BlueMart</div>
+                            <div className="flex flex-col gap-2">
+                                <span className="text-sm font-medium text-[#121217]">Essential Growth Project</span>
+                                <div className="items-center gap-2 flex">
+                                    <span className="flex items-center gap-[2px] text-sm text-[#878A93]">
+                                        <Church className="w-4 h-4" />
+                                        Status: <span className="text-[#121217] font-light">In progress</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="p-4 flex flex-col gap-2 border border-[#D1DAEC80] rounded-[14px]">
+                            <span className="text-[#1A1A1A] text-sm font-normal">Upcoming Deliverables</span>
+                            <span className="text-sm text-[#727374]">Funnel Audit</span>
+                            <span className="text-sm text-[#727374]">Strategy Development  </span>
+                            <span className="text-sm text-[#727374]">Execution & Support</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                            <Image src={'/images/scalepadi-ai-logo.svg'} alt="Scalepadi AI logo" width={147} height={36} />
+                            <Link href={'/workspace/1'}>
+                                <Button variant={'outline'} className="text-xs">View workspace</Button>
+                            </Link>
+                        </div>
+                    </div>
+                    <div className="p-4 gap-3 rounded-3xl bg-[#FBFCFC] flex flex-col">
+                        <div className="top w-full flex items-center gap-3 pb-3">
+                            <div className="bg-[#D1F7FF] flex items-center justify-center p-[5.84px] text-[#1A1A1A] text-xs h-[54px] rounded-[11.68px]">BlueMart</div>
+                            <div className="flex flex-col gap-2">
+                                <span className="text-sm font-medium text-[#121217]">Essential Growth Project</span>
+                                <div className="items-center gap-2 flex">
+                                    <span className="flex items-center gap-[2px] text-sm text-[#878A93]">
+                                        <Church className="w-4 h-4" />
+                                        Status: <span className="text-[#121217] font-light">In progress</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="p-4 flex flex-col gap-2 border border-[#D1DAEC80] rounded-[14px]">
+                            <span className="text-[#1A1A1A] text-sm font-normal">Upcoming Deliverables</span>
+                            <span className="text-sm text-[#727374]">Funnel Audit</span>
+                            <span className="text-sm text-[#727374]">Strategy Development  </span>
+                            <span className="text-sm text-[#727374]">Execution & Support</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                            <Image src={'/images/scalepadi-ai-logo.svg'} alt="Scalepadi AI logo" width={147} height={36} />
+                            <Link href={'/workspace/1'}>
+                                <Button variant={'outline'} className="text-xs">View workspace</Button>
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+                {false && <div className="empty-state h-full w-full bg-[#FBFCFC] rounded-3xl p-3">
+                    <div className="bg-[#FFFFFF] h-full w-full rounded-[14px] border border-[#D1DAEC80] flex items-center justify-center py-5">
+                        <div className="flex flex-col items-center w-full lg:w-[533px] justify-center gap-10">
+                            <Image src={'/images/empty-search.svg'} alt="Search icon" width={164} height={150} />
+                            <span className="text-center text-base text-[#878A93]">You do not have any active projects yet, your projects will appear here as soon as you are matched with a project</span>
+                            <Button className="text-white bg-primary rounded-[14px] hover:bg-primary-hover hover:text-black">start a new project</Button>
+                        </div>
+                    </div>
+                </div>}
+            </div>
         </div>
     )
 }

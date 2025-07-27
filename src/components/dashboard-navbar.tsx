@@ -1,12 +1,17 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 import Image from "next/image";
 
 const DashboardNav = ({ withLogo = true }: { withLogo?: boolean }) => {
+
+    const pathName = usePathname()
+    const route = pathName.replace(/^\//, '');
+
     return (
-        <nav className="w-full bg-white border-b border-primary-border flex items-center justify-between py-2 px-4 lg:px-14">
-            {!withLogo && <div></div>}
+        <nav className="w-full bg-white border-b border-primary-border flex items-center justify-between py-2 px-4 lg:pr-14">
+            {!withLogo && <div className="text-[#0E1426] text-lg font-medium">{ route.charAt(0).toUpperCase() + route.slice(1) }</div>}
             {withLogo && <Image src={'/logo.svg'} alt="Logo" width={104} height={27.54} />}
 
             <div className="flex items-center gap-2">
