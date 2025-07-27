@@ -13,6 +13,7 @@ const config: Config = {
   			primary: {
   				DEFAULT: '#1746A2',
   				light: '#7B55FF',
+				hover: '#F2BB05',
   				dark: '#3E00C2',
 				foreground: 'hsl(var(--primary-foreground))',
 				border: '#E5E8EB',
