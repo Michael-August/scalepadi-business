@@ -61,8 +61,8 @@ const Experts = () => {
                         </div>
                     </div>
                     <div className="flex items-center justify-between">
-                        <Button onClick={() => router.push('/business-setup')} className="text-xs text-white rounded-[14px] hover:bg-primary-hover hover:text-black">Invite to project</Button>
-                        <Button variant={'outline'} className="text-xs rounded-[14px]">View expert</Button>
+                        <Button onClick={() => router.push(`/business-setup?route=experts&expertName=`)} className="text-xs text-white rounded-[14px] hover:bg-primary-hover hover:text-black">Invite to project</Button>
+                        <Button onClick={() => router.push('/experts/1')} variant={'outline'} className="text-xs rounded-[14px]">View expert</Button>
                     </div>
                 </div>
                 <div className="bg-[#FBFCFC] p-4 flex flex-col gap-4 rounded-3xl">
