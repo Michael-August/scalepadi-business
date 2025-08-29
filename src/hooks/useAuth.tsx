@@ -78,7 +78,7 @@ export const useResendVerificationCode = () => {
     const { mutate: resendVerificationCode, isPending } = useMutation({
         mutationFn: async (data: { email: string}) => {
             try {
-                const res = await axiosClient.put("/verify-business", data);
+                const res = await axiosClient.put("/resend-verify-business", data);
                 if (res.data?.status === false) {
                     throw new Error(res.data?.message || "An error occurred during email verification");
                 }
