@@ -3,12 +3,16 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useGetExperts } from "@/hooks/useExpert"
 import { Search, Star } from "lucide-react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
+import { useState } from "react"
 
 const Experts = () => {
 
+    const [params, setParams] = useState(null)
+    const { experts, isLoading } = useGetExperts()
     const router = useRouter()
 
     return (

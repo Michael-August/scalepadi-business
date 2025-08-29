@@ -2,8 +2,11 @@
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input";
+import { useResendVerificationCode, useVerifyEmail } from "@/hooks/useAuth";
 import clsx from "clsx";
-import { useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 
 const OTP = () => {
 
@@ -11,8 +14,15 @@ const OTP = () => {
     const [otp, setOtp] = useState(Array(length).fill(""))
     const inputsRef = useRef<Array<HTMLInputElement | null>>([])
 
+    const [email, setEmail] = useState("")
+    const [secondesLeft, setSecondsLeft] = useState(60);
+    const [resendAvailable, setResendAvailable] = useState(false)
+    const router = useRouter();
+
+    const { verifyEmail, isPending } = useVerifyEmail();
+    const { resendVerificationCode, isPending: isResending } = useResendVerificationCode()
+
     const handleChange = (value: string, index: number) => {
-        if (!/^\d*$/.test(value)) return
         
         const digits = value.split("");
         const updatedOtp = [...otp]
@@ -28,6 +38,22 @@ const OTP = () => {
         if (nextIndex < length) {
             inputsRef.current[nextIndex]?.focus();
         }
+    }
+
+    const handleResend = () => {
+        setSecondsLeft(60);
+        setResendAvailable(false);
+        setOtp(Array(length).fill(""));
+        inputsRef.current[0]?.focus();
+
+        resendVerificationCode({ email }, {
+            onSuccess: () => {
+                toast.success("Code resent, check your email again")
+            },
+            onError: (error: any) => {
+                toast.error(`Failed to resend code ${error?.response?.data?.message || error?.message}`)
+            }
+        })
     }
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
@@ -47,13 +73,50 @@ const OTP = () => {
         }
     };
 
+    const handleSubmit = (e: any) => {
+        e.preventDefault();
+        if (otp.some(digit => digit === "")) {
+            toast.error("Please fill all OTP fields");
+            return;
+        }
+        
+        const otpData = {
+            code: otp.join("")
+        };
+        verifyEmail(otpData, {
+            onSuccess: (res) => {
+                toast.success("Email verified successfully");
+                localStorage.setItem("token", res.data.token)
+                router.push('/business-setup');
+                localStorage.removeItem("newUserEmail");
+            },
+            onError: (error) => {
+                console.error("Error verifying OTP:", error);
+                toast.error(error.message || "An error occurred during OTP verification");
+            }
+        });
+    }
+
+    useEffect(() => {
+        setEmail(localStorage.getItem("newUserEmail") || "")
+    }, [])
+
+    useEffect(() => {
+        if (secondesLeft > 0) {
+            const timer = setTimeout(() => setSecondsLeft((s) => s - 1), 1000)
+            return () => clearTimeout(timer)
+        } else {
+            setResendAvailable(true)
+        }
+    }, [secondesLeft])
+
     return (
         <div>
             <div className="flex justify-center py-10 lg:py-28">
                 <div className="flex flex-col gap-6">
                     <div className="top flex flex-col gap-4 items-center justify-center">
                         <span className="text-primary-text font-bold lg:text-[32px] text-2xl">Code Your Email</span>
-                        <span className="text-secondary-text text-base font-normal text-center">Enter the code sent to your email: <span className="text-primary">Devidezeri@gmail.com</span> to continue.</span>
+                        <span className="text-secondary-text text-base font-normal text-center">Enter the code sent to your email: <span className="text-primary">{email}</span> to continue.</span>
                     </div>
 
                     <div className="rounded-3xl bg-white p-10 border border-[#EFF2F3] w-full flex flex-col gap-6">
@@ -66,7 +129,7 @@ const OTP = () => {
                                         ref={(el) => { inputsRef.current[index] = el; }}
                                         maxLength={length}
                                         placeholder="*"
-                                        inputMode="numeric"
+                                        inputMode="text"
                                         className={clsx("text-center w-16 h-12 rounded-xl text-xl font-medium border border-[#D1DAEC80]")}
                                         value={digit}
                                         onChange={(e) => handleChange(e.target.value, index)}
@@ -76,11 +139,20 @@ const OTP = () => {
 
                                 }
                             </div>
-                            <span className="font-normal text-sm w-fit text-primary cursor-pointer">
-                                Resend code
-                            </span>
+                            <div className="font-normal text-sm w-fit cursor-pointer">
+                                {resendAvailable ? (
+                                    <span className="text-primary" onClick={handleResend}>
+                                        Resend code
+                                    </span>
+                                    ) : (
+                                        <span className="text-[#CDD0D5]">Resend code <span className="text-[#868C98]">{ secondesLeft }s</span></span>  
+                                    )
+
+                                }
+                                
+                            </div>
                         </div>
-                        <Button className="bg-primary text-white w-fit rounded-[14px] px-4 py-6">Verify code</Button>
+                        <Button disabled={isPending} onClick={handleSubmit} className="bg-primary text-white w-fit rounded-[14px] px-4 py-6">{isPending ? 'verifying code...' : 'Verify code'}</Button>
                     </div>
                 </div>
             </div>

@@ -8,10 +8,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { Users2, Clock, Church, Download, File, Plus, Link, X, Pin, Verified, Star, LinkIcon } from "lucide-react";
 import { useState } from "react";
 import Image from "next/image";
+import { useParams } from "next/navigation";
+import { useGetProject } from "@/hooks/useProject";
 
 const ProjectDetails = () => {
 
     const [activeTab, setActiveTab] = useState<'projectOverview' | 'taskTracker'>('projectOverview')
+
+    const { projectId } = useParams()
+    
+    const { project, isLoading } = useGetProject(projectId as string)
 
     const [openReview, setOpenReview] = useState(false)
     const [openRejectReason, setOpenRejectReason] = useState(false)
@@ -22,7 +28,7 @@ const ProjectDetails = () => {
                 <div className="heading w-full bg-[#F8F8F8] py-4 px-6 flex items-center gap-2">
                     <span onClick={() => window.history.back()} className="text-[#1746A2AB] text-sm font-medium cursor-pointer">Back to My projects</span>
                     <span className="text-[#CFD0D4] text-sm">/</span>
-                    <span className="text-[#1A1A1A] text-sm font-medium">Growth Audit for GreenMart </span>
+                    <span className="text-[#1A1A1A] text-sm font-medium">{project?.data?.title}</span>
                     <span className="text-[#CFD0D4] text-sm">/</span>
                 </div>
 
@@ -30,7 +36,7 @@ const ProjectDetails = () => {
                     <div className="top w-full flex items-center gap-3">
                         <div className="bg-[#D1F7FF] flex items-center justify-center p-[5.84px] text-[#1A1A1A] text-xs h-[54px] rounded-[11.68px]">BlueMart</div>
                         <div className="flex flex-col gap-2">
-                            <span className="text-sm text-[#878A93] ">Growth Audit for GreenMart </span>
+                            <span className="text-sm text-[#878A93] ">{ project?.data?.title }</span>
                             <div className="items-center gap-2 flex">
                                 <span className="flex items-center gap-[2px] text-sm text-[#878A93]">
                                     <Users2 className="w-4 h-4" />
@@ -47,7 +53,7 @@ const ProjectDetails = () => {
                             <div className="items-center gap-1 flex">
                                 <span className="flex items-center gap-[2px] text-sm text-[#878A93]">
                                     <Church className="w-4 h-4" />
-                                    Status: <span className="text-[#121217]">In progress</span>
+                                    Status: <span className="text-[#121217]">{project?.data?.status}</span>
                                 </span>
                                 <span className="flex items-center gap-[2px] text-sm text-[#878A93]">
                                     <Church className="w-4 h-4" />
@@ -87,15 +93,12 @@ const ProjectDetails = () => {
                             dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(yourContent) }}
                         /> */}
                         <span className="text-sm text-[#727374]">
-                            Theming allows users to leverage the power of the dotLottie format by adding multiple themes into a single file. This enables you can easily embed one animation file into your design project and switch between themes without the need to create multiple files.
-                        </span>
-                        <span className="text-sm text-[#727374]">
-                            Theming allows users to leverage the power of the dotLottie format by adding multiple themes into a single file. This enables you can easily embed one animation file into your design project and switch between themes without the need to create multiple files.
+                            {project?.data?.brief}
                         </span>
                     </div>
                     <div className="flex flex-col gap-2">
                         <span className="text-[#1A1A1A] text-sm font-normal">Goal</span>
-                        <span className="text-sm text-[#727374]">Increase weekly customer sign-ups by 30% in 6 weeks through acquisition funnel optimization and sales outreach.</span>
+                        <span className="text-sm text-[#727374]">{ project?.data?.goal }</span>
                     </div>
                     <div className="flex flex-col gap-2">
                         <span className="text-[#1A1A1A] text-sm font-normal">Challenge</span>

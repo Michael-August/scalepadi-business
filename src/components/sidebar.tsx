@@ -1,12 +1,28 @@
+"use client"
+
+import { useLogout } from "@/hooks/useAuth"
 import { Routes } from "@/lib/routes"
 import { ChevronRight, Folder, FolderOpen, LogOutIcon } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 const SideBar = ({ onLinkClick }: { onLinkClick?: () => void }) => {
 
     const pathname = usePathname();
+    const router = useRouter();
+    const { logout, isPending } = useLogout()
+
+    const handleLogOut = () => {
+        logout(undefined, {
+            onSuccess: () => {
+                toast.success('logout successful')
+                localStorage.clear()
+                router.push("/signin")
+            }
+        })
+    }
     
     return (
         <div className="bg-[#ffffff] w-full border-r border-[#EDEEF3] px-[18px] py-[30px] flex flex-col gap-14">
@@ -49,9 +65,10 @@ const SideBar = ({ onLinkClick }: { onLinkClick?: () => void }) => {
                     </div>
                     <div
                         className={`cursor-pointer rounded-xl w-full items-center px-4 py-3 flex text-[#E33161] gap-[10px] font-medium text-sm`}
+                        onClick={handleLogOut}
                     >
                         <LogOutIcon className="w-5 h-5" />
-                        <span>Log out</span>
+                        <span>{isPending ? "Loging out..." : 'Log out'}</span>
                     </div>
                 </div>
             </div>

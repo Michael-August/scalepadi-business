@@ -11,12 +11,64 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
+import * as z from 'zod';
+import { Controller, FormProvider, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { useSignUp } from '@/hooks/useAuth';
+
+const signupFormSchema = z.object({
+    name: z.string().min(1, "Full name is required"),
+    title: z.string().min(1, "Title is required"),
+    email: z.string().email("Invalid email address"),
+    phone: z.string().min(1, "Phone number is required"),
+    password: z
+        .string()
+        .min(8, "Password must be at least 8 characters long")
+        .refine((value) => {
+            // Check for at least one uppercase letter, one lowercase letter, one number, and one special character
+            return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(value);
+        }, "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"),
+    terms: z.boolean().refine((val) => val === true, {
+        message: "You must accept the terms and conditions"
+    })
+});
 
 const SignUp = () => {
-
-    const [pageState, setPageState] = useState('initial')
     
     const [showPassword, setShowPassword] = useState(false);
+
+    const router = useRouter();
+    const { signUp, isPending } = useSignUp();
+
+    const { handleSubmit, control, formState: { errors }, register, reset } = useForm({
+        resolver: zodResolver(signupFormSchema),
+        defaultValues: {
+            name: '',
+            title: '',
+            email: '',
+            phone: '',
+            password: '',
+            terms: false
+        }
+    });
+
+    const onSubmit = (data: any) => {
+        signUp(data, {
+            onSuccess: (res) => {
+                console.log(res);
+                localStorage.setItem("newUserEmail", data.email);
+                toast.success("Sign up successful");
+                reset();
+                router.replace('/otp');
+            },
+            onError: (error) => {
+                toast.error(error.message || "An error occurred during sign up");
+                console.error("Sign up error:", error);
+            }
+        });
+    }
 
     return (
         <div>
@@ -30,16 +82,23 @@ const SignUp = () => {
                         </div>
     
                         <div className="rounded-3xl bg-white p-10 border border-[#EFF2F3] w-full">
-                            <form action="" className="flex flex-col gap-6">
-                            <div className="form-group flex flex-col gap-2">
+                            <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
+                                <div className="form-group flex flex-col gap-2">
                                     <Label>Full Name <span className="text-red-600">*</span></Label>
-                                    <Input className="rounded-[14px] py-6 px-4 border border-[#D1DAEC]" type="text" placeholder="Enter Full Name" />
+                                    <Input {...register('name')} className="rounded-[14px] py-6 px-4 border border-[#D1DAEC]" type="text" placeholder="Enter Full Name" />
+                                    {errors.name && <span className="text-red-600 text-sm">{errors.name.message}</span>}
+                                </div>
+                                <div className="form-group flex flex-col gap-2">
+                                    <Label>Business Name <span className="text-red-600">*</span></Label>
+                                    <Input {...register('title')} className="rounded-[14px] py-6 px-4 border border-[#D1DAEC]" type="text" placeholder="Enter Business Name" />
+                                    {errors.title && <span className="text-red-600 text-sm">{errors.title.message}</span>}
                                 </div>
                                 <div className="form-group flex flex-col gap-2">
                                     <Label>Email <span className="text-red-600">*</span></Label>
-                                    <Input className="rounded-[14px] py-6 px-4 border border-[#D1DAEC]" type="email" placeholder="Enter email" />
+                                    <Input {...register('email')} className="rounded-[14px] py-6 px-4 border border-[#D1DAEC]" type="email" placeholder="Enter email" />
+                                    {errors.email && <span className="text-red-600 text-sm">{errors.email.message}</span>}
                                 </div>
-                                <div className="form-group flex flex-col gap-2">
+                                {/* <div className="form-group flex flex-col gap-2">
                                     <Label>Category <span className="text-red-600">*</span></Label>
                                     <Select>
                                         <SelectTrigger className="w-full rounded-[14px] py-6 px-4 border border-[#D1DAEC]">
@@ -52,8 +111,8 @@ const SignUp = () => {
                                             </SelectGroup>
                                         </SelectContent>
                                     </Select>
-                                </div>
-                                <div className="form-group flex flex-col gap-2">
+                                </div> */}
+                                {/* <div className="form-group flex flex-col gap-2">
                                     <Label>Gender <span className="text-red-600">*</span></Label>
                                     <Select>
                                         <SelectTrigger className="w-full rounded-[14px] py-6 px-4 border border-[#D1DAEC]">
@@ -66,15 +125,27 @@ const SignUp = () => {
                                             </SelectGroup>
                                         </SelectContent>
                                     </Select>
-                                </div>
+                                </div> */}
                                 <div className="form-group w-full flex flex-col gap-2">
                                     <Label>Phone Number <span className="text-red-600">*</span></Label>
-                                    <PhoneInput
-                                        country={'ng'}
-                                        value={''}
-                                        onChange={() => {}}
-                                        inputClass="!rounded-[14px] !py-6 !w-full !border !border-[#D1DAEC]"
-                                        containerClass="!w-full !rounded-tl-[14px] !rounded-bl-[14px]"
+                                    <Controller
+                                        name="phone"
+                                        control={control}
+                                        rules={{ required: "Phone number is required" }}
+                                        render={({ field, fieldState }) => (
+                                        <div>
+                                            <PhoneInput
+                                            country={"ng"}
+                                            value={field.value}
+                                            onChange={(phone) => field.onChange(phone)}
+                                            inputClass="!rounded-[14px] !py-6 !w-full !border !border-[#D1DAEC]"
+                                            containerClass="!w-full !rounded-tl-[14px] !rounded-bl-[14px]"
+                                            />
+                                            {fieldState.error && (
+                                                <p className="text-red-500 text-sm mt-1">{fieldState.error.message}</p>
+                                            )}
+                                        </div>
+                                        )}
                                     />
                                 </div>
                                 <div className="form-group flex flex-col gap-2">
@@ -86,6 +157,7 @@ const SignUp = () => {
                                             className="rounded-[14px] py-6 px-4 border border-[#D1DAEC] pr-12"
                                             type={showPassword ? "text" : "password"}
                                             placeholder="Enter password"
+                                            {...register('password')}
                                         />
                                         <button
                                             type="button"
@@ -95,11 +167,37 @@ const SignUp = () => {
                                             {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                                         </button>
                                     </div>
-                                    <div className='flex items-center gap-3'>
-                                        <Checkbox /> <span className='text-sm text-[#878A93]'>By signing up, you agree to our <span className='text-primary cursor-pointer'>Terms</span>.</span>
+                                    {errors.password && <span className="text-red-600 text-sm">{errors.password.message}</span>}
+                                    <div className='flex flex-col gap-3'>
+                                        <div className='flex items-center gap-3'>
+                                            <Controller
+                                                name="terms"
+                                                control={control}
+                                                rules={{ required: "You must accept the terms" }}
+                                                render={({ field, fieldState }) => (
+                                                    <div className="flex flex-col gap-2">
+                                                        <div className="flex items-center gap-3">
+                                                            
+                                                            <Checkbox
+                                                                checked={field.value}
+                                                                onCheckedChange={field.onChange}
+                                                            />
+                                                            <span className="text-sm text-[#878A93]">
+                                                                By signing up, you agree to our{" "}
+                                                                <span className="text-primary cursor-pointer">Terms</span>.
+                                                            </span>
+                                                        </div>
+
+                                                        {fieldState.error && (
+                                                            <p className="text-red-500 text-sm">{fieldState.error.message}</p>
+                                                        )}
+                                                    </div>
+                                                )}
+                                            />
+                                        </div>
                                     </div>
                                 </div>
-                                <Button className="bg-primary text-white w-fit rounded-[14px] px-4 py-6">Create my account</Button>
+                                <Button type='submit' disabled={isPending} className="bg-primary text-white w-fit rounded-[14px] px-4 py-6">{isPending ? 'creating account...' : 'Create my account'}</Button>
                             </form>
                         </div>
     

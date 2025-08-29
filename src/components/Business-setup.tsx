@@ -9,16 +9,21 @@ import { Plus, X } from "lucide-react";
 import { useState } from "react";
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import Image from "next/image";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useSetBusinessDetails } from "@/hooks/useAuth";
 
 const BusinessSetUp = () => { 
 
     const [file, setFile] = useState<File | null>();
     const methods = useForm({ mode: 'onBlur' });
 
+    const router = useRouter()
+
     const searchParams = useSearchParams()
     const comingFromExpert = searchParams.get('route')
     const expertName = searchParams.get('expertName')
+
+    const { setBusinessDetails, isPending } = useSetBusinessDetails()
     
     return (
         <div className="flex w-full flex-col gap-10">
@@ -138,7 +143,7 @@ const BusinessSetUp = () => {
                                     <Button className="w-fit rounded-[14px] py-6 px-4 bg-primary text-white hover:bg-[#F2BB05] hover:text-black">
                                         Continue
                                     </Button>
-                                    <Button className="bg-transparent text-primary w-fit rounded-[14px] py-6 px-4 hover:bg-white hover:text-primary">Explore ScalePadi AI</Button>
+                                    <Button type="button" onClick={(e) => router.replace('/workspace')} className="bg-transparent text-primary w-fit rounded-[14px] py-6 px-4 hover:bg-white hover:text-primary">Explore ScalePadi</Button>
                                 </div>
                                 <Image src={'/images/analysis-done.svg'} alt="Analysis progress" width={314} height={36} />
                             </form>
