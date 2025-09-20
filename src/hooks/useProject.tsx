@@ -1,5 +1,5 @@
 import { axiosClient } from "@/lib/api/axiosclient"
-import { useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { AxiosError } from "axios"
 import { toast } from "sonner"
 
@@ -35,7 +35,7 @@ export const useGetProject = (projectId: string) => {
         queryKey: ["projects", projectId],
         queryFn: async () => {
             try {
-                const response = await axiosClient.get(`/projects/${projectId}`)
+                const response = await axiosClient.get(`/project/${projectId}`)
                 if (response.data?.status === false) {
                     throw new Error(response.data?.message || "Failed to fetch project");
                 }
@@ -57,3 +57,31 @@ export const useGetProject = (projectId: string) => {
 
     return { project: data, isLoading }
 }   
+
+export const useCreateProject = () => {
+    const queryClient = useQueryClient()
+    const { mutate: createproject, isPending } = useMutation({
+        mutationFn: async (data: any) => {
+            try {
+                const res = await axiosClient.post("/project", data);
+                if (res.data?.status === false) {
+                    throw new Error(res.data?.message || "An error occurred while setting project");
+                }
+                return res.data;
+            } catch (error: any) {
+                // If backend sent a message, preserve it
+                const backendMessage =
+                error?.response?.data?.message ||
+                error?.message ||
+                "An error occurred during project creation";
+
+                throw new Error(backendMessage);
+            }
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey: ["projects"]})
+        }
+    })
+
+    return { createproject, isPending };
+}

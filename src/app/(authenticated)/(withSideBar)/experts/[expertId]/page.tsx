@@ -1,14 +1,17 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
+import { useGetExpert } from "@/hooks/useExpert"
 import { Dot, Star, Verified } from "lucide-react"
 import Image from "next/image"
-import { useRouter } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import { useState } from "react"
 
 const ExpertDetails = () => {
     const [activeTab, setActiveTab] = useState<'about' | 'review'>('about')
+    const {expertId} = useParams()
 
+    const { expert, isLoading } = useGetExpert(expertId as string)
     const router = useRouter()
 
     return (

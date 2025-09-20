@@ -6,21 +6,69 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Users2, Clock, Church, Download, File, Plus, Link, X, Pin, Verified, Star, LinkIcon } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useGetProject } from "@/hooks/useProject";
+import moment from "moment"
+import { PaystackButton } from "react-paystack";
+import { toast } from "sonner";
 
 const ProjectDetails = () => {
 
     const [activeTab, setActiveTab] = useState<'projectOverview' | 'taskTracker'>('projectOverview')
+    const publicKey = process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY!;
 
     const { projectId } = useParams()
     
     const { project, isLoading } = useGetProject(projectId as string)
 
+    const [user, setUser] = useState<any>()
+
     const [openReview, setOpenReview] = useState(false)
     const [openRejectReason, setOpenRejectReason] = useState(false)
+
+    const componentProps = {
+        reference: new Date().getTime().toString(),
+        email: user?.email,
+        amount: project?.data?.proposedBudget && parseFloat(project?.data?.proposedBudget) * 100,
+        publicKey,
+        text: "Make Payment",
+        metadata: {
+            custom_fields: [
+                {
+                    display_name: "Type",
+                    variable_name: "type",
+                    value: "project",
+                },
+                {
+                    display_name: "Business Id",
+                    variable_name: "businessId",
+                    value: `${user?.id}`,
+                },
+                {
+                    display_name: "Project Id",
+                    variable_name: "projectId",
+                    value: `${project?.data?.id}`,
+                },
+                {
+                    display_name: "Amount",
+                    variable_name: "amount",
+                    value: `${project?.data?.proposedBudget}`,
+                },
+            ],
+        },
+        onSuccess: (response: any) => {
+            toast.success("Payment successful!")
+        },
+    };
+
+    useEffect(() => { 
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            setUser(JSON.parse(storedUser));
+        }
+    }, [])
 
     return (
         <div className="flex w-full flex-col gap-6">
@@ -44,7 +92,7 @@ const ProjectDetails = () => {
                                 </span>
                                 <span className="flex items-center gap-[2px] text-sm text-[#878A93]">
                                     <Clock className="w-4 h-4" />
-                                    Due: <span className="text-[#121217]">June 30</span>
+                                    Due: <span className="text-[#121217]">{ moment(project?.data?.dueDate).format("MMMM DD") }</span>
                                 </span>
                             </div>
                         </div>
@@ -65,6 +113,10 @@ const ProjectDetails = () => {
                     <Image className="cursor-pointer" src={'/images/scalepadi-ai-logo.svg'} alt="Scalepadi AI logo" width={147} height={36} />
                 </div>
             </div>
+
+            {project?.data?.proposedBudget && <PaystackButton {...componentProps} className="text-white bg-primary py-2 px-3 rounded-[14px] w-fit hover:bg-primary-hover hover:text-black" />}
+            {project?.data?.proposedBudget && <span className="text-sm text-green-700">Proposed Price: { project?.data?.proposedBudget }</span>}
+
             <div className="project-details w-full lg:w-[895px] pb-10">
                 <div className="tab pt-2 w-1/2 flex items-center gap-5 bg-[#F9FAFB]">
                     <div
@@ -115,13 +167,25 @@ const ProjectDetails = () => {
                     </div>
                     <div className="flex flex-col gap-2">
                         <span className="text-[#1A1A1A] text-sm font-normal">Resources</span>
-                        <div className="flex items-center gap-[10px]">
-                            <div className="flex items-center gap-2 p-1 bg-[#F7F9F9] rounded-3xl">
+                        {project?.data?.resources?.map((resource: string, index: number) => (
+                            <div key={index} className="flex items-center gap-[10px]">
+                                <div className="flex items-center gap-2 p-1 bg-[#F7F9F9] rounded-3xl">
                                 <File className="w-4 h-4 text-primary" />
-                                <span className="text-[#878A93] text-xs">CRM Snapshot ()CSV</span>
-                                <Download className="w-4 h-4 text-[#878A93] cursor-pointer" />
+                                <span className="text-[#878A93] text-[8px] truncate max-w-[120px]">
+                                    {resource.split("/").pop()} {/* show only file name */}
+                                </span>
+                                <a
+                                    href={resource}
+                                    download
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    <Download className="w-4 h-4 text-[#878A93] cursor-pointer" />
+                                </a>
+                                </div>
                             </div>
-                        </div>
+                        ))}
+                        
                     </div>
                     <div className="flex flex-col gap-2">
                         <span className="text-[#1A1A1A] text-sm font-normal">Deliverables</span>
