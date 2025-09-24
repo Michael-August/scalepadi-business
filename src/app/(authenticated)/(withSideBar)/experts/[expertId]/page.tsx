@@ -1,8 +1,10 @@
 "use client"
 
+import InviteExpert from "@/components/InviteExpert"
 import { Button } from "@/components/ui/button"
 import { useGetExpert } from "@/hooks/useExpert"
-import { Dot, Star, Verified } from "lucide-react"
+import { noAvatar } from "@/lib/constatnts"
+import { Dot, Sheet, Star, Verified, X } from "lucide-react"
 import Image from "next/image"
 import { useParams, useRouter } from "next/navigation"
 import { useState } from "react"
@@ -12,7 +14,8 @@ const ExpertDetails = () => {
     const {expertId} = useParams()
 
     const { expert, isLoading } = useGetExpert(expertId as string)
-    const router = useRouter()
+
+    const [ openSheet, setOpenSheet ] = useState(false)
 
     return (
         <div className="flex flex-col gap-6">
@@ -26,13 +29,14 @@ const ExpertDetails = () => {
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                             <div className="w-[52px] relative h-[52px] rounded-full">
-                                <Image src={'/images/profile-pic.svg'} alt="Profile Picture" width={52} height={52} className="rounded-full w-full h-full" />
+                                <Image src={expert?.profilePicture || noAvatar} alt="Profile Picture" width={52} height={52} className="rounded-full w-full h-full" />
                                 <Image className="absolute bottom-0 left-0" src={'/images/profile-logo.svg'} alt="logo" width={20} height={20} />
                             </div>
                             <div className="flex flex-col gap-2">
-                                <span className="text-[#1A1A1A] font-medium text-[20px]">David ABIJANRI eerie</span>
+                                <span className="text-[#1A1A1A] font-medium text-[20px]">{expert?.name}</span>
                                 <div className="flex items-center gap-2">
-                                    <span className="flex items-center gap-[2px] font-medium text-[#878A93] text-sm"><Verified className="w-4 h-4 text-[#878A93]" /> Verified Growth Marketing Expert</span>
+                                    {expert?.verified && <span className="flex items-center gap-[2px] font-medium text-[#878A93] text-sm"><Verified className="w-4 h-4 text-white fill-green-600" /> Verified {expert?.role[0]}</span>}
+                                    {!expert?.verified && <span className="flex items-center gap-[2px] font-medium text-[#878A93] text-sm"><X className="w-4 h-4 text-red-600" /> {expert?.role[0]}</span>}
                                 </div>
                                 <div className="flex items-center gap-1">
                                     <Star className="w-[13.33px] h-[13.33px] text-[#F2BB05] fill-[#F6CF50]" />
@@ -41,7 +45,7 @@ const ExpertDetails = () => {
                                 </div>
                             </div>
                         </div>
-                        <Button onClick={() => router.push(`/business-setup?route=experts&expertName=`)} className="text-sm text-white rounded-[14px] hover:bg-primary-hover hover:text-black">Invite expert</Button>
+                        <Button onClick={() => setOpenSheet(true)} className="text-sm text-white rounded-[14px] hover:bg-primary-hover hover:text-black">Invite expert</Button>
                     </div>
 
                     <div className="flex flex-col">
@@ -71,7 +75,7 @@ const ExpertDetails = () => {
                                     <div className="flex items-center justify-between">
                                         <span className="font-medium text-[20px] text-primary">Bio</span>
                                     </div>
-                                    <span className="text-[#353D44] text-sm">👋 Hey there! I&rsquo;m Abdullahi Suleiman (sulbyee) a curious, resourceful, and impact-driven UI/UX and Product Designer with over 3 years of experience turning ideas into user-centered digital experiences across mobile, web, and wearables.</span>
+                                    <span className="text-[#353D44] text-sm">{expert?.bio}</span>
                                 </div>
 
                                 <div className="about flex flex-col rounded-[14px] bg-white border border-[#D1DAEC80] gap-3 p-4">
@@ -81,23 +85,23 @@ const ExpertDetails = () => {
                                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                                         <div className="flex flex-col gap-1">
                                             <span className="text-[#878A93] text-sm font-normal">Years of experience</span>
-                                            <span className="text-[#1A1A1A] text-base font-semibold">2 years</span>
+                                            <span className="text-[#1A1A1A] text-base font-semibold">{expert?.yearsOfExperience}</span>
                                         </div>
                                         <div className="flex flex-col gap-1">
                                             <span className="text-[#878A93] text-sm font-normal">Category</span>
-                                            <span className="text-[#1A1A1A] text-base font-semibold">Expert</span>
+                                            <span className="text-[#1A1A1A] text-base font-semibold">{expert?.category}</span>
                                         </div>
                                         <div className="flex flex-col gap-1">
                                             <span className="text-[#878A93] text-sm font-normal">Role</span>
-                                            <span className="text-[#1A1A1A] text-base font-semibold">Business developer</span>
+                                            <span className="text-[#1A1A1A] text-base font-semibold">{expert?.role[0]}</span>
                                         </div>
                                     </div>
                                     <div className="flex flex-col gap-4 mt-5">
                                         <span className="font-medium text-sm text-[#878A93]">Skills</span>
                                         <div className="flex items-center gap-2 flex-wrap">
-                                            <span className="bg-[#F2F7FF] p-2 rounded-[14px] text-xs text-[#1E88E5]">Rapid prototyping</span>
-                                            <span className="bg-[#F2F7FF] p-2 rounded-[14px] text-xs text-[#1E88E5]">Agile development strategies</span>
-                                            <span className="bg-[#F2F7FF] p-2 rounded-[14px] text-xs text-[#1E88E5]">Business Analytics</span>
+                                            {expert?.skills.map((skill: string, index: number) => (
+                                                <span key={index} className="bg-[#F2F7FF] p-2 rounded-[14px] text-xs text-[#1E88E5]">{skill}</span>
+                                            ))}
                                         </div>
                                     </div>
                                 </div>
@@ -290,6 +294,8 @@ const ExpertDetails = () => {
                     </div>
                 </div>
             </div>
+
+            <InviteExpert open={openSheet} setOpenSheet={setOpenSheet} expertName={expert?.name} expertId={expertId as string} />
         </div>
     )
 }

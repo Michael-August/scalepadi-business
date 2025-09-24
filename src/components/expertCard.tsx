@@ -4,10 +4,13 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { IExpert } from "@/types/expert.type";
+import InviteExpert from "./InviteExpert";
 
 export default function ExpertCard({ expert }: { expert: IExpert }) {
   const [expanded, setExpanded] = useState(false);
   const router = useRouter();
+
+  const [openSheet, setOpenSheet] = useState(false)
 
   const MAX_LENGTH = 100; // number of characters to show before "view more"
     const isLongBio = expert.bio && expert.bio.length > MAX_LENGTH;
@@ -53,7 +56,7 @@ export default function ExpertCard({ expert }: { expert: IExpert }) {
       <div className="p-4 flex flex-col gap-2 border border-[#D1DAEC80] rounded-[14px]">
         <div className="gap-3 flex flex-col">
           <span className="text-[#1A1A1A] text-sm">
-            {displayedBio}
+            {expert.bio}
             {isLongBio && !expanded && "..."}
             {isLongBio && (
               <button
@@ -95,7 +98,7 @@ export default function ExpertCard({ expert }: { expert: IExpert }) {
       <div className="flex items-center justify-between">
         <Button
           onClick={() =>
-            router.push(`/business-setup?route=experts&expertName=${expert.name}`)
+            setOpenSheet(true)
           }
           className="text-xs text-white rounded-[14px] hover:bg-primary-hover hover:text-black"
         >
@@ -109,6 +112,8 @@ export default function ExpertCard({ expert }: { expert: IExpert }) {
           View expert
         </Button>
       </div>
+
+      <InviteExpert open={openSheet} setOpenSheet={setOpenSheet} expertName={expert?.name} expertId={expert?.id} />
     </div>
   );
 }

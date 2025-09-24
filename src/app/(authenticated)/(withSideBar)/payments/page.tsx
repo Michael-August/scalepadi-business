@@ -96,20 +96,30 @@ const Payments = () => {
                     <td className="px-6 py-4">
                       <span className="flex items-center text-[#878A93] gap-2">
                         <span className="w-3 h-3 rounded-full bg-green-500"></span>
-                        {row.business}
+                        {row?.projectId?.businessId?.name}
                       </span>
                     </td>
                     <td className="px-6 py-4">
                       <span className="flex text-[#878A93] items-center gap-2">
                         <span className={`w-3 h-3 rounded-full ${row.planColor}`}></span>
-                        {row.plan}
+                        {row.plan || "-"}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-[#878A93]">{row.amount}</td>
-                    <td className="px-6 py-4 text-[#878A93]">{row.renewal}</td>
+                    <td className="px-6 py-4 text-[#878A93]">{row.renewal || "-"}</td>
                     <td className="px-6 py-4 text-[#878A93]">
                       <span
-                        className={`text-xs font-medium px-3 py-1 rounded-full ${row.statusColor}`}
+                        className={`text-xs font-medium px-3 py-1 rounded-full 
+                          ${
+                            row.status === "successful"
+                              ? "bg-green-50 text-green-600 border border-green-200"
+                              : row.status === "failed"
+                              ? "bg-red-50 text-red-600 border border-red-200"
+                              : row.status === "pending"
+                              ? "bg-yellow-50 text-yellow-600 border border-yellow-200"
+                              : "bg-gray-50 text-gray-600 border border-gray-200"
+                          }
+                        `}
                       >
                         {row.status}
                       </span>

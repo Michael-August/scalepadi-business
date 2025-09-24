@@ -56,7 +56,6 @@ const BusinessSetUp = () => {
   const { createproject, isPending: isCreatingProject } = useCreateProject();
 
   const onSubmit = async (data: FormValues) => {
-    console.log("Form submitted:", data, files);
 
     const formData = new FormData();
     formData.append("title", data.title);
@@ -64,7 +63,6 @@ const BusinessSetUp = () => {
     if (data.goal) formData.append("goal", data.goal);
     if (data.dueDate) formData.append("dueDate", data.dueDate.toString());
     formData.append("requestSupervisor", "false");
-    formData.append("proposedTotalCost", "1000000");
 
     // Append multiple files
     files.forEach((file) => {

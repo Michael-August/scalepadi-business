@@ -9,10 +9,12 @@ import { Users2, Clock, Church, Download, File, Plus, Link, X, Pin, Verified, St
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
-import { useGetProject } from "@/hooks/useProject";
+import { useGetProject, useGetTasksForProject } from "@/hooks/useProject";
 import moment from "moment"
 import { PaystackButton } from "react-paystack";
 import { toast } from "sonner";
+import { IExpert } from "@/types/expert.type";
+import { noAvatar } from "@/lib/constatnts";
 
 const ProjectDetails = () => {
 
@@ -22,6 +24,7 @@ const ProjectDetails = () => {
     const { projectId } = useParams()
     
     const { project, isLoading } = useGetProject(projectId as string)
+    const { tasks, isLoading: isLoadingTasks } = useGetTasksForProject(projectId as string)
 
     const [user, setUser] = useState<any>()
 
@@ -31,7 +34,7 @@ const ProjectDetails = () => {
     const componentProps = {
         reference: new Date().getTime().toString(),
         email: user?.email,
-        amount: project?.data?.proposedBudget && parseFloat(project?.data?.proposedBudget) * 100,
+        amount: project?.data?.proposedTotalCost && parseFloat(project?.data?.proposedTotalCost) * 100,
         publicKey,
         text: "Make Payment",
         metadata: {
@@ -88,7 +91,7 @@ const ProjectDetails = () => {
                             <div className="items-center gap-2 flex">
                                 <span className="flex items-center gap-[2px] text-sm text-[#878A93]">
                                     <Users2 className="w-4 h-4" />
-                                    Members: <span className="text-[#121217]">03</span>
+                                    Members: <span className="text-[#121217]">{project?.data?.experts?.length}</span>
                                 </span>
                                 <span className="flex items-center gap-[2px] text-sm text-[#878A93]">
                                     <Clock className="w-4 h-4" />
@@ -103,10 +106,10 @@ const ProjectDetails = () => {
                                     <Church className="w-4 h-4" />
                                     Status: <span className="text-[#121217]">{project?.data?.status}</span>
                                 </span>
-                                <span className="flex items-center gap-[2px] text-sm text-[#878A93]">
+                                {/* <span className="flex items-center gap-[2px] text-sm text-[#878A93]">
                                     <Church className="w-4 h-4" />
                                     Role: <span className="text-[#121217]">In progress</span>
-                                </span>
+                                </span> */}
                             </div>
                         </div>
                     </div>
@@ -114,11 +117,11 @@ const ProjectDetails = () => {
                 </div>
             </div>
 
-            {project?.data?.proposedBudget && <PaystackButton {...componentProps} className="text-white bg-primary py-2 px-3 rounded-[14px] w-fit hover:bg-primary-hover hover:text-black" />}
-            {project?.data?.proposedBudget && <span className="text-sm text-green-700">Proposed Price: { project?.data?.proposedBudget }</span>}
+            {project?.data?.proposedTotalCost && (project?.data?.paymentStatus === 'pending' || project?.data?.paymentStatus === 'cancelled') && <PaystackButton {...componentProps} className="text-white bg-primary py-2 px-3 rounded-[14px] w-fit hover:bg-primary-hover hover:text-black" />}
+            {project?.data?.proposedTotalCost && (project?.data?.paymentStatus === 'pending' || project?.data?.paymentStatus === 'cancelled') && <span className="text-sm text-green-700">Proposed Price: ₦{ project?.data?.proposedTotalCost.toLocaleString() }</span>}
 
             <div className="project-details w-full lg:w-[895px] pb-10">
-                <div className="tab pt-2 w-1/2 flex items-center gap-5 bg-[#F9FAFB]">
+                <div className="tab pt-2 w-full flex items-center gap-5 bg-[#F9FAFB]">
                     <div
                         className={`flex cursor-pointer w-full items-center justify-center border-b-2 pb-3
                         hover:border-[#3A96E8] transition-colors 
@@ -136,6 +139,12 @@ const ProjectDetails = () => {
                     >
                         <span className="text-sm">Task Tracker</span>
                     </div>
+                    <div
+                    className={`flex w-full items-center justify-center pb-3`}
+                    ></div>
+                    <div
+                        className={`flex w-full items-center justify-center pb-3`}
+                    ></div>
                 </div>
                 {activeTab === 'projectOverview' && <div className="w-full border border-[#F2F2F2] rounded-2xl p-6 flex flex-col gap-6">
                     <div className="flex flex-col gap-2">
@@ -206,29 +215,133 @@ const ProjectDetails = () => {
                         </div>
 
                         <div className="p-3 flex flex-col gap-4 rounded-3xl bg-[#FBFCFC]">
-                            <div className="flex items-center gap-2">
-                                <div className="w-[52px] relative h-[52px] rounded-full">
-                                    <Image src={'/images/profile-pic.svg'} alt="Profile Picture" width={52} height={52} className="rounded-full w-full h-full" />
-                                    <Image className="absolute bottom-0 left-0" src={'/images/profile-logo.svg'} alt="logo" width={20} height={20} />
+                            {project?.data?.experts?.length !== 0 &&
+                                <div className="flex flex-col gap-4">
+                                    {project?.data?.experts?.map((expert: any) => (
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-[52px] relative h-[52px] rounded-full">
+                                                <Image src={expert?.profilePicture as string || noAvatar} alt="Profile Picture" width={52} height={52} className="rounded-full w-full h-full" />
+                                                <Image className="absolute bottom-0 left-0" src={'/images/profile-logo.svg'} alt="logo" width={20} height={20} />
+                                            </div>
+                                            <div className="flex flex-col gap-2">
+                                                <span className="text-[#1A1A1A] font-medium text-[20px]">{expert?.id?.name}</span>
+                                                <div className="flex items-center gap-1">
+                                                    <Star className="w-[13.33px] h-[13.33px] text-[#F2BB05] fill-[#F6CF50]" />
+                                                    <Star className="w-[13.33px] h-[13.33px] text-[#F2BB05] fill-[#F6CF50]" />
+                                                    <Star className="w-[13.33px] h-[13.33px] text-[#F2BB05] fill-[#F6CF50]" />
+                                                    <Star className="w-[13.33px] h-[13.33px] text-[#F2BB05] fill-[#F6CF50]" />
+                                                    <Star className="w-[13.33px] h-[13.33px] text-[#CFD0D4] fill-[#E7ECEE]" />
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="flex items-center gap-[2px] font-medium text-[#878A93] text-sm"><Verified className="w-4 h-4 text-[#878A93]" /> Verified</span>
+                                                    <span className="flex items-center gap-[2px] font-medium text-[#878A93] text-sm"><Pin className="w-4 h-4 text-[#878A93]" /> Abuja,Nigeria</span>
+                                                    <span className="flex items-center gap-[2px] font-medium text-[#878A93] text-sm"><Clock className="w-4 h-4 text-[#878A93]" /> Availability: Full time</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                    
                                 </div>
-                                <div className="flex flex-col gap-2">
-                                    <span className="text-[#1A1A1A] font-medium text-[20px]">David ABIJANRI eerie</span>
-                                    <div className="flex items-center gap-1">
-                                        <Star className="w-[13.33px] h-[13.33px] text-[#F2BB05] fill-[#F6CF50]" />
-                                        <Star className="w-[13.33px] h-[13.33px] text-[#F2BB05] fill-[#F6CF50]" />
-                                        <Star className="w-[13.33px] h-[13.33px] text-[#F2BB05] fill-[#F6CF50]" />
-                                        <Star className="w-[13.33px] h-[13.33px] text-[#F2BB05] fill-[#F6CF50]" />
-                                        <Star className="w-[13.33px] h-[13.33px] text-[#CFD0D4] fill-[#E7ECEE]" />
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <span className="flex items-center gap-[2px] font-medium text-[#878A93] text-sm"><Verified className="w-4 h-4 text-[#878A93]" /> Verified</span>
-                                        <span className="flex items-center gap-[2px] font-medium text-[#878A93] text-sm"><Pin className="w-4 h-4 text-[#878A93]" /> Abuja,Nigeria</span>
-                                        <span className="flex items-center gap-[2px] font-medium text-[#878A93] text-sm"><Clock className="w-4 h-4 text-[#878A93]" /> Availability: Full time</span>
-                                    </div>
-                                </div>
-                            </div>
+                            }
 
-                            <div className="flex flex-col gap-4">
+                            {tasks?.data?.length === 0 && 
+                                <div className="flex flex-col gap-4 items-center justify-center">
+                                    <Image src={'https://www.shutterstock.com/image-vector/flat-icon-no-task-vector-260nw-2264189001.jpg'} alt="No tasks" width={200} height={200} />
+                                    <span className="text-sm text-[#727374]">No tasks have been assigned to this project yet</span>
+                                </div>
+                            }
+
+                            {tasks?.data?.length !== 0 && isLoadingTasks && <div>Loading tasks...</div>}
+                            {tasks?.data?.length !== 0 && !isLoadingTasks && tasks?.data?.map((task: any, index: number) => (
+                                <div key={task.id} className="flex flex-col gap-4">
+                                    <div className="bg-white p-3 rounded-2xl flex flex-col gap-4">
+                                        <span className="text-[#878A93] text-sm font-medium">Task {index + 1}: <span className="text-[#1A1A1A]">{task?.title}</span></span>
+                                        <span className="text-[#727374] text-sm">{task?.description}</span>
+                                    </div>
+
+                                    <div className="flex flex-col gap-4">
+                                        <div className="links flex items-center flex-wrap gap-2 w-full">
+                                            {task?.links?.map((link: string, index: number) => (
+                                                <div key={index} className="link border border-[#FEE1BA] flex px-2 py-[10px] items-center gap-2 rounded-[14px] lg:w-[367px]">
+                                                    <LinkIcon className="text-[#FF5F6D]" />
+                                                    {link}
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        {task?.submission?.length === 0 && <span className="text-sm text-[#727374]">No documents have been submitted for this task yet</span>}
+                                        {task?.submission?.length !== 0 &&
+                                            <div className="flex flex-col gap-1">
+                                                <div className="links flex items-center flex-wrap gap-2 w-full">
+                                                    <div className="link border border-[#FEE1BA] flex px-2 py-[10px] items-center gap-2 rounded-[14px] lg:w-[367px]">
+                                                        <LinkIcon className="text-[#FF5F6D]" />
+                                                        url
+                                                    </div>
+                                                    <div className="link border border-[#FEE1BA] flex px-2 py-[10px] items-center gap-2 rounded-[14px] lg:w-[367px]">
+                                                        <LinkIcon className="text-[#FF5F6D]" />
+                                                        url
+                                                    </div>
+                                                </div>
+
+                                                <div className="docs flex items-center gap-2 w-full">
+                                                    <div className="flex w-full items-center justify-between p-3 border border-[#F3F4F6] rounded-[12px]">
+                                                        <div className="flex items-center gap-3">
+                                                            <Image src={'/icons/file-icon.svg'} alt="file" width={32} height={32} />
+                                                            <div className="flex flex-col gap-1">
+                                                                <span className="text-sm text-[#353D44]">[Front] My phone bill.pdf</span>
+                                                                <span className="text-xs text-[#757B85]">250kb</span>
+                                                            </div>
+                                                        </div>
+                                                        <Download className="text-[#878A93] cursor-pointer w-5 h-5" />
+                                                    </div>
+                                                    <div className="flex w-full items-center justify-between p-3 border border-[#F3F4F6] rounded-[12px]">
+                                                        <div className="flex items-center gap-3">
+                                                            <Image src={'/icons/file-icon.svg'} alt="file" width={32} height={32} />
+                                                            <div className="flex flex-col gap-1">
+                                                                <span className="text-sm text-[#353D44]">[Front] My phone bill.pdf</span>
+                                                                <span className="text-xs text-[#757B85]">250kb</span>
+                                                            </div>
+                                                        </div>
+                                                        <Download className="text-[#878A93] cursor-pointer w-5 h-5" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                        <div className="docs flex items-center gap-2 w-full">
+                                            {task?.documents?.map((doc: string, index: number) => (
+                                                <div key={index} className="flex w-full items-center justify-between p-3 border border-[#F3F4F6] rounded-[12px]">
+                                                    <div className="flex items-center gap-3">
+                                                        <Image src={'/icons/file-icon.svg'} alt="file" width={32} height={32} />
+                                                        <div className="flex flex-col gap-1">
+                                                            <span className="text-sm text-[#353D44]">{doc.split("/").pop()}</span> {/* show only file name */}
+                                                            <span className="text-xs text-[#757B85]">250kb</span>
+                                                        </div>
+                                                    </div>
+                                                    <a
+                                                        href={doc}
+                                                        download
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                    >
+                                                        <Download className="text-[#878A93] cursor-pointer w-5 h-5" />
+                                                    </a>
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        {/* <div className="flex flex-col gap-1">
+                                            <span className="text-[#1A1A1A] text-sm">Additional notes</span>
+                                            <span className="text-sm text-[#727374]">{task?.additionalNotes}</span>
+                                        </div> */}
+
+                                        <div className="flex items-center justify-end gap-3">
+                                            <Button onClick={() => setOpenRejectReason(true)} variant={'outline'} className="border-red-500 text-red-600 rounded-[14px] hover:text-red-800">Reject</Button>
+                                            <Button onClick={() => setOpenReview(true)} className="text-white bg-primary rounded-[14px] hover:bg-primary-hover hover:text-black">Approve</Button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                            {/* <div className="flex flex-col gap-4">
                                 <div className="bg-white p-3 rounded-2xl flex flex-col gap-4">
                                     <span className="text-[#878A93] text-sm font-medium">Task 1: <span className="text-[#1A1A1A]">Audit the current acquisition funnel</span></span>
                                     <span className="text-[#727374] text-sm">Review GreenMart’s landing pages, sign-up process, and paid traffic sources. Identify key drop-off points and capture screenshots where applicable.</span>
@@ -279,7 +392,7 @@ const ProjectDetails = () => {
                                         <Button onClick={() => setOpenReview(true)} className="text-white bg-primary rounded-[14px] hover:bg-primary-hover hover:text-black">Approve</Button>
                                     </div>
                                 </div>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                 }

@@ -10,6 +10,10 @@ const nextConfig = {
 				protocol: "https",
 				hostname: "ui-avatars.com", // for ui avatars
 			},
+			{
+				protocol: "https",
+				hostname: "www.shutterstock.com", // for no tasks image
+			},
 		],
 	},
 };

@@ -85,3 +85,86 @@ export const useCreateProject = () => {
 
     return { createproject, isPending };
 }
+
+export const useGetTasksForProject = (projectId: string) => {
+    const { data, isLoading } = useQuery({
+        queryKey: ["tasks", projectId],
+        queryFn: async () => {
+            try {
+                const response = await axiosClient.get(`/tasks/${projectId}`)
+                if (response.data?.status === false) {
+                    throw new Error(response.data?.message || "Failed to fetch tasks");
+                }
+                return response.data
+            } catch (error: any) {
+                if (error instanceof AxiosError) {
+                    toast.error(error.response?.data?.message || "Failed to fetch tasks")
+                } else if (error instanceof Error) {
+                    toast.error(error.message)
+                } else {
+                    toast.error("An unexpected error occured while fetching tasks")
+                }
+
+                throw error;
+            }
+        },
+        enabled: !!projectId
+    })
+
+    return { tasks: data, isLoading }
+}
+
+export const useHireExpert = () => {
+    const queryClient = useQueryClient()
+    const { mutate: hireExpert, isPending } = useMutation({
+        mutationFn: async (data: any) => {
+            try {
+                const res = await axiosClient.post("/hire", data);
+                if (res.data?.status === false) {
+                    throw new Error(res.data?.message || "An error occurred while Hiring expert");
+                }
+                return res.data;
+            } catch (error: any) {
+                // If backend sent a message, preserve it
+                const backendMessage =
+                error?.response?.data?.message ||
+                error?.message ||
+                "An error occurred during project creation";
+
+                throw new Error(backendMessage);
+            }
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey: ["experts"]})
+        }
+    })
+
+    return { hireExpert, isPending };
+}
+
+export const useGetHires = () => {
+    const { data, isLoading } = useQuery({
+        queryKey: ["Hires"],
+        queryFn: async () => {
+            try {
+                const response = await axiosClient.get(`/hires/business`)
+                if (response.data?.status === false) {
+                    throw new Error(response.data?.message || "Failed to fetch hires");
+                }
+                return response.data
+            } catch (error: any) {
+                if (error instanceof AxiosError) {
+                    toast.error(error.response?.data?.message || "Failed to fetch hires")
+                } else if (error instanceof Error) {
+                    toast.error(error.message)
+                } else {
+                    toast.error("An unexpected error occured while fetching hires")
+                }
+
+                throw error;
+            }
+        },
+    })
+
+    return { hires: data, isLoading }
+}

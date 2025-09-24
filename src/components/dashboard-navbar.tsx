@@ -7,7 +7,7 @@ import Image from "next/image";
 const DashboardNav = ({ withLogo = true }: { withLogo?: boolean }) => {
 
     const pathName = usePathname()
-    const route = pathName.replace(/^\//, '');
+    const route = pathName.split("/")[1] || ""
 
     return (
         <nav className="w-full bg-white border-b border-primary-border flex items-center justify-between py-2 px-4 lg:pr-14">

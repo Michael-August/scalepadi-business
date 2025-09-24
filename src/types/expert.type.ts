@@ -17,6 +17,7 @@ export interface IExpert {
     preferredIndustry: string[];
     skills: string[];
     bio: string;
+    profilePicture?: string;
     availability: "available" | "not available" | string;
     projectCount: number;
     taskCount: number;
