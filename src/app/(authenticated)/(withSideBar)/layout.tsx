@@ -44,7 +44,7 @@ export default function RootLayout({
                     <button className="lg:hidden cursor-pointer px-4" onClick={() => setIsSidebarOpen(true)}>
                         <Menu className="text-gray-700" />
                     </button>
-                    <DashboardNav withLogo={false} />
+                    <DashboardNav className="w-[85%]" />
                 </div>
 
                 {/* Scrollable Main Content */}

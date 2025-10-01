@@ -1,29 +1,37 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
-import { toast } from "sonner" // or whatever toast you use
+import { toast } from "sonner"
 import { AxiosError } from "axios"
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Input } from "@/components/ui/input"
-import { Search } from "lucide-react"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Skeleton } from "@/components/ui/skeleton"
 import { axiosClient } from "@/lib/api/axiosclient"
+import { useState } from "react"
+import { CalendarDays, CreditCard, Building2, User, Briefcase } from "lucide-react"
 
 const Payments = () => {
-  // Use react-query + axiosClient directly
-  const { data: transactions, isLoading, isError, error } = useQuery({
-    queryKey: ["transactions"],
+  const [type, setType] = useState<"subscription" | "project" | "hire">("subscription")
+
+  const {
+    data: transactions,
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ["transactions", type],
     queryFn: async () => {
       try {
-        const res = await axiosClient.get("/transactions")
+        const res = await axiosClient.get(`/transactions?type=${type}`)
         if (res.data?.status === false) {
           throw new Error(res.data?.message || "Failed to fetch transactions")
         }
-        return res.data?.data
+        return res.data?.data || []
       } catch (err: any) {
         if (err instanceof AxiosError) {
           toast.error(err.response?.data?.message || "Failed to fetch transactions")
-        } else if (err instanceof Error) {
-          toast.error(err.message)
         } else {
           toast.error("An unexpected error occurred while fetching transactions")
         }
@@ -32,110 +40,247 @@ const Payments = () => {
     },
   })
 
-  return (
-    <div className="flex flex-col gap-4">
-      <header className="text-2xl font-semibold text-[#1A1A1A]">
-        All transactions
-      </header>
+  const StatusBadge = ({ status }: { status: string }) => {
+    const getStatusVariant = (status: string) => {
+      switch (status?.toLowerCase()) {
+        case "active":
+        case "completed":
+        case "paid":
+          return "default"
+        case "pending":
+        case "in progress":
+          return "secondary"
+        case "cancelled":
+        case "failed":
+          return "destructive"
+        default:
+          return "outline"
+      }
+    }
 
-      <div className="py-3 px-4 rounded-[14px] flex flex-col gap-6">
-        <span className="text-sm text-[#1A1A1A]">Track your subscriptions and renewal status</span>
-        <div className="flex items-center gap-2">
-          <Select defaultValue="all">
-            <SelectTrigger className="w-fit rounded-[10px] h-9 border border-[#D1DAEC]">
-              <SelectValue placeholder="Filter" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectItem value="all">All</SelectItem>
-                <SelectItem value="rating">By rating</SelectItem>
-                <SelectItem value="duration">By duration</SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-          <Select defaultValue="sort">
-            <SelectTrigger className="w-fit rounded-[10px] h-9 border border-[#D1DAEC]">
-              <SelectValue placeholder="Filter" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectItem value="sort">Sort</SelectItem>
-                <SelectItem value="rating">By rating</SelectItem>
-                <SelectItem value="duration">By duration</SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-          <div className="rounded-[10px] p-2 flex items-center h-9 gap-2 border border-[#D8DFE2]">
-            <Search className="w-3 h-3" />
-            <Input className="border-0 bg-transparent !h-9 p-0" placeholder="search" />
-          </div>
+    return (
+      <Badge variant={getStatusVariant(status)} className="font-medium">
+        {status}
+      </Badge>
+    )
+  }
+
+  const renderTableHead = () => {
+    if (type === "subscription") {
+      return (
+        <TableRow>
+          {/* <TableHead className="font-semibold">
+            <div className="flex items-center gap-2">
+              <Building2 className="h-4 w-4" />
+              Business
+            </div>
+          </TableHead> */}
+          <TableHead className="font-semibold">
+            <div className="flex items-center gap-2">
+              <CreditCard className="h-4 w-4" />
+              Plan
+            </div>
+          </TableHead>
+          <TableHead className="font-semibold">Amount Paid</TableHead>
+          <TableHead className="font-semibold">
+            <div className="flex items-center gap-2">
+              <CalendarDays className="h-4 w-4" />
+              Next Renewal
+            </div>
+          </TableHead>
+          <TableHead className="font-semibold">Status</TableHead>
+        </TableRow>
+      )
+    }
+
+    if (type === "project") {
+      return (
+        <TableRow>
+          {/* <TableHead className="font-semibold">
+            <div className="flex items-center gap-2">
+              <Building2 className="h-4 w-4" />
+              Business
+            </div>
+          </TableHead> */}
+          <TableHead className="font-semibold">
+            <div className="flex items-center gap-2">
+              <Briefcase className="h-4 w-4" />
+              Project Title
+            </div>
+          </TableHead>
+          <TableHead className="font-semibold">Amount</TableHead>
+          <TableHead className="font-semibold">Project Status</TableHead>
+          <TableHead className="font-semibold">Payment Status</TableHead>
+        </TableRow>
+      )
+    }
+
+    if (type === "hire") {
+      return (
+        <TableRow>
+          {/* <TableHead className="font-semibold">
+            <div className="flex items-center gap-2">
+              <User className="h-4 w-4" />
+              Hirer
+            </div>
+          </TableHead> */}
+          <TableHead className="font-semibold">Role</TableHead>
+          <TableHead className="font-semibold">Amount</TableHead>
+          <TableHead className="font-semibold">Status</TableHead>
+        </TableRow>
+      )
+    }
+  }
+
+  const renderTableBody = () => {
+    return transactions?.data?.map((row: any, index: number) => {
+      if (type === "subscription") {
+        return (
+          <TableRow key={index} className="hover:bg-muted/50 transition-colors">
+            {/* <TableCell className="font-medium">{row.subscriptionId?.businessId?.name}</TableCell> */}
+            <TableCell>
+              <div className="flex flex-col">
+                <span className="font-medium">{row.subscriptionId?.planName}</span>
+              </div>
+            </TableCell>
+            <TableCell className="font-mono font-semibold">₦{row.amount.toLocaleString()}</TableCell>
+            <TableCell className="text-muted-foreground">
+              {new Date(row.subscriptionId?.nextRenewal).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              })}
+            </TableCell>
+            <TableCell>
+              <StatusBadge status={row.status} />
+            </TableCell>
+          </TableRow>
+        )
+      }
+
+      if (type === "project") {
+        return (
+          <TableRow key={index} className="hover:bg-muted/50 transition-colors">
+            {/* <TableCell className="font-medium">{row.projectId?.businessId?.name}</TableCell> */}
+            <TableCell>
+              <div className="flex flex-col">
+                <span className="font-medium">{row.projectId?.title}</span>
+              </div>
+            </TableCell>
+            <TableCell className="font-mono font-semibold">₦{row.amount.toLocaleString()}</TableCell>
+            <TableCell>
+              <StatusBadge status={row.projectId?.status} />
+            </TableCell>
+            <TableCell>
+              <StatusBadge status={row.status} />
+            </TableCell>
+          </TableRow>
+        )
+      }
+
+      if (type === "hire") {
+        return (
+          <TableRow key={index} className="hover:bg-muted/50 transition-colors">
+            {/* <TableCell className="font-medium">{row.hireId?.businessId?.name}</TableCell> */}
+            <TableCell>
+              <div className="flex flex-col">
+                <span className="font-medium">{row.hireId?.role}</span>
+              </div>
+            </TableCell>
+            <TableCell className="font-mono font-semibold">₦{row.amount.toLocaleString()}</TableCell>
+            <TableCell>
+              <StatusBadge status={row.status} />
+            </TableCell>
+          </TableRow>
+        )
+      }
+    })
+  }
+
+  const LoadingSkeleton = () => (
+    <div className="space-y-4">
+      {[...Array(5)].map((_, i) => (
+        <div key={i} className="flex items-center space-x-4">
+          <Skeleton className="h-4 w-[200px]" />
+          <Skeleton className="h-4 w-[150px]" />
+          <Skeleton className="h-4 w-[100px]" />
+          <Skeleton className="h-4 w-[120px]" />
+          <Skeleton className="h-6 w-[80px]" />
         </div>
+      ))}
+    </div>
+  )
 
-        {isLoading ? (
-          <span>Loading...</span>
-        ) : isError ? (
-          <span className="text-red-500">{(error as Error).message}</span>
-        ) : transactions?.data?.length === 0 ? (
-          <span>Empty table</span>
-        ) : (
-          <div className="overflow-x-auto rounded-md">
-            <table className="min-w-full text-sm text-left text-gray-700">
-              <thead className="bg-gray-100">
-                <tr className="text-[#878A93]">
-                  <th className="px-6 py-3">Business</th>
-                  <th className="px-6 py-3">Subscription Plan</th>
-                  <th className="px-6 py-3">Amount</th>
-                  <th className="px-6 py-3">Next Renewal</th>
-                  <th className="px-6 py-3">Status</th>
-                  <th className="px-6 py-3">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {transactions?.data?.map((row: any, index: number) => (
-                  <tr key={index} className="border-t">
-                    <td className="px-6 py-4">
-                      <span className="flex items-center text-[#878A93] gap-2">
-                        <span className="w-3 h-3 rounded-full bg-green-500"></span>
-                        {row?.projectId?.businessId?.name}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="flex text-[#878A93] items-center gap-2">
-                        <span className={`w-3 h-3 rounded-full ${row.planColor}`}></span>
-                        {row.plan || "-"}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-[#878A93]">{row.amount}</td>
-                    <td className="px-6 py-4 text-[#878A93]">{row.renewal || "-"}</td>
-                    <td className="px-6 py-4 text-[#878A93]">
-                      <span
-                        className={`text-xs font-medium px-3 py-1 rounded-full 
-                          ${
-                            row.status === "successful"
-                              ? "bg-green-50 text-green-600 border border-green-200"
-                              : row.status === "failed"
-                              ? "bg-red-50 text-red-600 border border-red-200"
-                              : row.status === "pending"
-                              ? "bg-yellow-50 text-yellow-600 border border-yellow-200"
-                              : "bg-gray-50 text-gray-600 border border-gray-200"
-                          }
-                        `}
-                      >
-                        {row.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <button className="text-sm text-[#0E1426] border border-[#E7E8E9] rounded px-3 py-1">
-                        {row.action}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+  const EmptyState = () => (
+    <div className="flex flex-col items-center justify-center py-12 text-center">
+      <div className="rounded-full bg-muted p-3 mb-4">
+        <CreditCard className="h-6 w-6 text-muted-foreground" />
       </div>
+      <h3 className="text-lg font-semibold mb-2">No transactions found</h3>
+      <p className="text-muted-foreground text-sm max-w-sm">
+        {type === "subscription" && "You don't have any subscription transactions yet."}
+        {type === "project" && "You don't have any project transactions yet."}
+        {type === "hire" && "You don't have any hire transactions yet."}
+      </p>
+    </div>
+  )
+
+  return (
+    <div className="space-y-6">
+      <div className="space-y-2">
+        <h1 className="text-3xl font-bold tracking-tight">Transactions</h1>
+        <p className="text-muted-foreground">
+          View and manage all your payment transactions across different services.
+        </p>
+      </div>
+
+      <Card className="border-none">
+        <CardHeader className="pb-4">
+          <Tabs value={type} onValueChange={(val: any) => setType(val)} className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="subscription" className="flex items-center gap-2">
+                <CreditCard className="h-4 w-4" />
+                Subscriptions
+              </TabsTrigger>
+              <TabsTrigger value="project" className="flex items-center gap-2">
+                <Briefcase className="h-4 w-4" />
+                Projects
+              </TabsTrigger>
+              <TabsTrigger value="hire" className="flex items-center gap-2">
+                <User className="h-4 w-4" />
+                Hire
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </CardHeader>
+
+        <CardContent>
+          <Tabs value={type} onValueChange={(val: any) => setType(val)}>
+            <TabsContent value={type} className="mt-0">
+              {isLoading ? (
+                <LoadingSkeleton />
+              ) : isError ? (
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <div className="rounded-full bg-destructive/10 p-3 mb-4">
+                    <CreditCard className="h-6 w-6 text-destructive" />
+                  </div>
+                  <h3 className="text-lg font-semibold mb-2 text-destructive">Error loading transactions</h3>
+                  <p className="text-muted-foreground text-sm max-w-sm">{(error as Error).message}</p>
+                </div>
+              ) : !transactions || transactions.length === 0 ? (
+                <EmptyState />
+              ) : (
+                <div className="rounded-lg">
+                  <Table>
+                    <TableHeader>{renderTableHead()}</TableHeader>
+                    <TableBody>{renderTableBody()}</TableBody>
+                  </Table>
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+      </Card>
     </div>
   )
 }

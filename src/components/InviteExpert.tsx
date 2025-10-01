@@ -87,7 +87,7 @@ const InviteExpert = ({ open, setOpenSheet, expertName, expertId }: { open: bool
                                 </div>
 
                                 <div className="form-group flex flex-col gap-2">
-                                    <Label>Title</Label>
+                                    <Label>Duration</Label>
                                     <Input
                                         {...methods.register("duration")}
                                         className="rounded-[14px] py-6 px-4 border border-[#D1DAEC]"

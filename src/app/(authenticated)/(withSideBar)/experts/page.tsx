@@ -1,7 +1,5 @@
 "use client"
 
-import ExpertCard from "@/components/expertCard"
-import { HireCard } from "@/components/HireCard"
 import InviteExpert from "@/components/InviteExpert"
 import ProjectSkeletonLoader from "@/components/skeletons/projects.skeleton"
 import { Button } from "@/components/ui/button"
@@ -13,14 +11,26 @@ import { IExpert } from "@/types/expert.type"
 import { Search, Star } from "lucide-react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import dynamic from "next/dynamic"
+import { HireCard } from "@/components/HireCard"
+
+const ExpertCard = dynamic(() => import("@/components/expertCard"), { ssr: false })
 
 const Experts = () => {
 
     const [activeTab, setActiveTab] = useState<'experts' | 'hired'>('experts')
     const [params, setParams] = useState(null)
+    const [user, setUser] = useState<any>(null)
     const { experts, isLoading } = useGetExperts()
     const { hires } = useGetHires()
+
+    useEffect(() => { 
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            setUser(JSON.parse(storedUser));
+        }
+    }, [])
 
     return (
         <div className="w-full">

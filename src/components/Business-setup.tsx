@@ -24,6 +24,7 @@ import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { format } from "date-fns";
 import { Calendar } from "./ui/calendar";
+import { useCreateChallenge } from "@/hooks/useChallenge";
 
 // ---- Define types for the form ----
 type FormValues = {
@@ -51,15 +52,21 @@ const BusinessSetUp = () => {
   const searchParams = useSearchParams();
   const comingFromExpert = searchParams.get("route");
   const expertName = searchParams.get("expertName");
+  const mode = searchParams.get("type")
 
-  const { setBusinessDetails, isPending } = useSetBusinessDetails();
+  // const { setBusinessDetails, isPending } = useSetBusinessDetails();
   const { createproject, isPending: isCreatingProject } = useCreateProject();
+  const { createChallenge, isPending: isCreatingChallenge } = useCreateChallenge()
 
   const onSubmit = async (data: FormValues) => {
 
     const formData = new FormData();
     formData.append("title", data.title);
-    formData.append("brief", data.brief);
+    if (mode === "create") {
+      formData.append("brief", data.brief);
+    } else {
+      formData.append("description", data.brief);
+    }
     if (data.goal) formData.append("goal", data.goal);
     if (data.dueDate) formData.append("dueDate", data.dueDate.toString());
     formData.append("requestSupervisor", "false");
@@ -69,12 +76,22 @@ const BusinessSetUp = () => {
       formData.append("files", file);
     });
 
-    createproject(formData, {
-      onSuccess: () => {
-        toast.success("Project created");
-        router.push("/workspace");
-      },
-    });
+    if (mode === 'create') {
+      createproject(formData, {
+        onSuccess: () => {
+          toast.success("Project created");
+          router.push("/workspace");
+        },
+      });
+    } else {
+      createChallenge(formData, {
+        onSuccess: (res) => {
+          localStorage.setItem("challenge", JSON.stringify(res?.data))
+          toast.success("Challenge analysis completed");
+          router.push("/analysis-result")
+        }
+      })
+    }
   };
 
   return (
@@ -112,7 +129,7 @@ const BusinessSetUp = () => {
                 </div>
 
                 {/* Challenge type */}
-                <div className="form-group flex flex-col gap-2">
+                {/* <div className="form-group flex flex-col gap-2">
                   <Label>Challenge type</Label>
                   <Controller
                     name="challengeType"
@@ -132,7 +149,7 @@ const BusinessSetUp = () => {
                       </Select>
                     )}
                   />
-                </div>
+                </div> */}
 
                 {/* Problem description */}
                 <div className="form-group flex flex-col gap-2">
@@ -273,10 +290,10 @@ const BusinessSetUp = () => {
                 <div className="flex gap-2 items-center">
                   <Button
                     type="submit"
-                    disabled={isPending || isCreatingProject}
+                    disabled={isCreatingChallenge || isCreatingProject}
                     className="w-fit rounded-[14px] py-6 px-4 bg-primary text-white hover:bg-[#F2BB05] hover:text-black"
                   >
-                    {isPending || isCreatingProject
+                    {isCreatingChallenge || isCreatingProject
                       ? "Submitting..."
                       : "Continue"}
                   </Button>
@@ -288,12 +305,12 @@ const BusinessSetUp = () => {
                     Explore ScalePadi
                   </Button>
                 </div>
-                <Image
+                {/* <Image
                   src={"/images/analysis-done.svg"}
                   alt="Analysis progress"
                   width={314}
                   height={36}
-                />
+                /> */}
               </form>
             </FormProvider>
           </div>

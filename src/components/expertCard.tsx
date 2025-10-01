@@ -1,3 +1,5 @@
+"use client"
+
 import { useState } from "react";
 import { Star } from "lucide-react";
 import Image from "next/image";
@@ -14,20 +16,6 @@ export default function ExpertCard({ expert }: { expert: IExpert }) {
 
   const MAX_LENGTH = 100; // number of characters to show before "view more"
     const isLongBio = expert.bio && expert.bio.length > MAX_LENGTH;
-    
-    // Short bio
-    const shortBio = "Frontend engineer passionate about clean UI and modern web development.";
-
-    // Medium bio
-    const mediumBio = "Frontend engineer with a strong background in React and TypeScript. Experienced in building user-focused applications and collaborating with cross-functional teams to deliver high-quality products.";
-
-    // Long bio
-    const longBio = "As a dedicated frontend engineer, I specialize in crafting responsive, accessible, and scalable web applications using React, Next.js, and TypeScript. With experience spanning finance, e-commerce, and SaaS platforms, I enjoy translating complex problems into elegant user interfaces. I thrive in team-oriented environments, value clean code practices, and continuously explore emerging tools and technologies to stay ahead in the ever-evolving web development landscape.";
-
-
-  const displayedBio = expanded
-    ? shortBio
-      : longBio?.slice(0, MAX_LENGTH);
     
     const getAvatarUrl = (name?: string) => {
         if (name) {
