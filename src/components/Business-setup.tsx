@@ -54,6 +54,7 @@ const BusinessSetUp = () => {
 	const comingFromExpert = searchParams.get("route");
 	const expertName = searchParams.get("expertName");
 	const mode = searchParams.get("type");
+	const challengeId = searchParams.get("challengeId");
 
 	// const { setBusinessDetails, isPending } = useSetBusinessDetails();
 	const { createproject, isPending: isCreatingProject } = useCreateProject();
@@ -70,6 +71,7 @@ const BusinessSetUp = () => {
 		}
 		if (data.goal) formData.append("goal", data.goal);
 		if (data.dueDate) formData.append("dueDate", data.dueDate.toString());
+		if (challengeId) formData.append("challengeId", challengeId);
 		formData.append("requestSupervisor", "false");
 
 		// Append multiple files
