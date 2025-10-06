@@ -3,6 +3,7 @@ import axios, {
 	AxiosInstance,
 	InternalAxiosRequestConfig,
 } from "axios";
+import { toast } from "sonner";
 
 const axiosClient: AxiosInstance = axios.create({
 	baseURL: "https://scale-padi.onrender.com/api/v1",
@@ -64,6 +65,13 @@ axiosClient.interceptors.response.use(
 
 			if (status === 403 && message === "Access Denied: Invalid Token.") {
 				localStorage.clear();
+				window.location.href = "/signin";
+			}
+
+			if (status === 401 && message === "Unauthorized business") {
+				toast.info(
+					"Please log in with correct credentials to view this"
+				);
 				window.location.href = "/signin";
 			}
 		}
