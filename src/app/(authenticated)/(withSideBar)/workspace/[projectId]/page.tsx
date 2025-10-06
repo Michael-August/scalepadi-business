@@ -53,8 +53,8 @@ const ProjectDetails = () => {
 		reference: new Date().getTime().toString(),
 		email: user?.email,
 		amount:
-			project?.data?.proposedTotalCost &&
-			parseFloat(project?.data?.proposedTotalCost) * 100,
+			project?.data?.totalCost &&
+			parseFloat(project?.data?.totalCost) * 100,
 		publicKey,
 		text: "Make Payment",
 		metadata: {
@@ -77,7 +77,7 @@ const ProjectDetails = () => {
 				{
 					display_name: "Amount",
 					variable_name: "amount",
-					value: `${project?.data?.proposedBudget}`,
+					value: `${project?.data?.totalCost}`,
 				},
 			],
 		},
@@ -174,7 +174,7 @@ const ProjectDetails = () => {
 				</div>
 			</div>
 
-			{project?.data?.proposedTotalCost &&
+			{project?.data?.totalCost &&
 				(project?.data?.paymentStatus === "pending" ||
 					project?.data?.paymentStatus === "cancelled") && (
 					<PaystackButton
@@ -182,12 +182,12 @@ const ProjectDetails = () => {
 						className="text-white bg-primary py-2 px-3 rounded-[14px] w-fit hover:bg-primary-hover hover:text-black"
 					/>
 				)}
-			{project?.data?.proposedTotalCost &&
+			{project?.data?.totalCost &&
 				(project?.data?.paymentStatus === "pending" ||
 					project?.data?.paymentStatus === "cancelled") && (
 					<span className="text-sm text-green-700">
 						Proposed Price: ₦
-						{project?.data?.proposedTotalCost.toLocaleString()}
+						{project?.data?.totalCost.toLocaleString()}
 					</span>
 				)}
 
