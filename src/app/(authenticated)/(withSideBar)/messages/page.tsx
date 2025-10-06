@@ -147,7 +147,6 @@ export default function MessagesPage() {
 							msg.id === tempMessage.id ? res.data : msg
 						)
 					);
-					toast.success("Message sent");
 				},
 				onError: () => {
 					setMessages((prev) =>
