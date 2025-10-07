@@ -71,7 +71,8 @@ const AiBusinessQuery = () => {
 					toast.success("Challenge analysis completed");
 				},
 				onError: (error) => {
-					if (error.message === "No subscription found") {
+					console.log(error.message);
+					if (error.message === "No subscription found.") {
 						toast.info("You need to subsrcibe to query AI");
 						router.push("/upgrade-plan");
 					}
