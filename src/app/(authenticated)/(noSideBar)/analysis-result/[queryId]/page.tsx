@@ -11,7 +11,7 @@ import {
 	ThumbsUp,
 } from "lucide-react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -38,7 +38,11 @@ const AnalysisResultPage = () => {
 	const { createChallenge, isPending: isCreatingChallenge } =
 		useCreateChallenge();
 
-	const { challenge: fetchedChallenge } = useGetChallengeById(challengeId);
+	const { queryId } = useParams();
+
+	const { challenge: fetchedChallenge } = useGetChallengeById(
+		queryId as string
+	);
 
 	// 👇 Ref for scrolling
 	const messagesEndRef = useRef<HTMLDivElement | null>(null);
@@ -151,7 +155,6 @@ const AnalysisResultPage = () => {
 	}, []);
 
 	useEffect(() => {
-		console.log(fetchedChallenge);
 		setMessages((prev) => {
 			const newMessages: IMessage[] = [];
 
@@ -215,7 +218,7 @@ const AnalysisResultPage = () => {
 
 			return newMessages.filter((msg) => msg.content); // cleanup empty/null
 		});
-	}, [fetchedChallenge, challengeId]);
+	}, [fetchedChallenge, queryId]);
 
 	// Auto scroll to bottom when messages change
 	useEffect(() => {
@@ -319,13 +322,25 @@ const AnalysisResultPage = () => {
 							)}
 
 							<div className="flex flex-col gap-4 mb-5">
-								<div className="flex flex-col gap-2">
+								{/* <div className="flex flex-col gap-2">
 									<span className="text-sm text-[#1A1A1A]">
 										Suggested Experts
 									</span>
 									<div className="flex items-center"></div>
-								</div>
-								<Button className="bg-primary text-white w-fit rounded-[14px] px-4 py-6">
+								</div> */}
+								<Button
+									onClick={() => {
+										router.push(
+											`/business-setup?challengeId=${
+												fetchedChallenge?.data[
+													fetchedChallenge?.data
+														?.length - 1
+												].id
+											}&type=create`
+										);
+									}}
+									className="bg-primary text-white w-fit rounded-[14px] px-4 py-6"
+								>
 									Get Started
 								</Button>
 							</div>

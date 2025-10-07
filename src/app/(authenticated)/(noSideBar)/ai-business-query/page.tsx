@@ -66,8 +66,8 @@ const AiBusinessQuery = () => {
 						"challenge",
 						JSON.stringify(res?.data)
 					);
-					router.push("/analysis-result");
-					localStorage.removeItemo("projectId");
+					router.push(`/analysis-result/${res.data.queryId}`);
+					localStorage.removeItem("projectId");
 					toast.success("Challenge analysis completed");
 				},
 			}

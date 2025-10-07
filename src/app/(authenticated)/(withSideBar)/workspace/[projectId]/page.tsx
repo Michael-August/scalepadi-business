@@ -105,42 +105,42 @@ const ProjectDetails = () => {
     setOpenReview(false);
   };
 
-  const componentProps = {
-    reference: new Date().getTime().toString(),
-    email: user?.email,
-    amount:
-      project?.data?.proposedTotalCost &&
-      parseFloat(project?.data?.proposedTotalCost) * 100,
-    publicKey,
-    text: "Make Payment",
-    metadata: {
-      custom_fields: [
-        {
-          display_name: "Type",
-          variable_name: "type",
-          value: "project",
-        },
-        {
-          display_name: "Business Id",
-          variable_name: "businessId",
-          value: `${user?.id}`,
-        },
-        {
-          display_name: "Project Id",
-          variable_name: "projectId",
-          value: `${project?.data?.id}`,
-        },
-        {
-          display_name: "Amount",
-          variable_name: "amount",
-          value: `${project?.data?.proposedBudget}`,
-        },
-      ],
-    },
-    onSuccess: (response: any) => {
-      toast.success("Payment successful!");
-    },
-  };
+	const componentProps = {
+		reference: new Date().getTime().toString(),
+		email: user?.email,
+		amount:
+			project?.data?.totalCost &&
+			parseFloat(project?.data?.totalCost) * 100,
+		publicKey,
+		text: "Make Payment",
+		metadata: {
+			custom_fields: [
+				{
+					display_name: "Type",
+					variable_name: "type",
+					value: "project",
+				},
+				{
+					display_name: "Business Id",
+					variable_name: "businessId",
+					value: `${user?.id}`,
+				},
+				{
+					display_name: "Project Id",
+					variable_name: "projectId",
+					value: `${project?.data?.id}`,
+				},
+				{
+					display_name: "Amount",
+					variable_name: "amount",
+					value: `${project?.data?.totalCost}`,
+				},
+			],
+		},
+		onSuccess: (response: any) => {
+			toast.success("Payment successful!");
+		},
+	};
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -223,21 +223,22 @@ const ProjectDetails = () => {
         </div>
       </div>
 
-      {project?.data?.proposedTotalCost &&
-        (project?.data?.paymentStatus === "pending" ||
-          project?.data?.paymentStatus === "cancelled") && (
-          <PaystackButton
-            {...componentProps}
-            className="text-white bg-primary py-2 px-3 rounded-[14px] w-fit hover:bg-primary-hover hover:text-black"
-          />
-        )}
-      {project?.data?.proposedTotalCost &&
-        (project?.data?.paymentStatus === "pending" ||
-          project?.data?.paymentStatus === "cancelled") && (
-          <span className="text-sm text-green-700">
-            Proposed Price: ₦{project?.data?.proposedTotalCost.toLocaleString()}
-          </span>
-        )}
+			{project?.data?.totalCost &&
+				(project?.data?.paymentStatus === "pending" ||
+					project?.data?.paymentStatus === "cancelled") && (
+					<PaystackButton
+						{...componentProps}
+						className="text-white bg-primary py-2 px-3 rounded-[14px] w-fit hover:bg-primary-hover hover:text-black"
+					/>
+				)}
+			{project?.data?.totalCost &&
+				(project?.data?.paymentStatus === "pending" ||
+					project?.data?.paymentStatus === "cancelled") && (
+					<span className="text-sm text-green-700">
+						Proposed Price: ₦
+						{project?.data?.totalCost.toLocaleString()}
+					</span>
+				)}
 
       <div className="project-details w-full lg:w-[895px] pb-10">
         <div className="tab pt-2 w-full flex items-center gap-5 bg-[#F9FAFB]">
