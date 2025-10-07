@@ -72,7 +72,7 @@ const AiBusinessQuery = () => {
 				},
 				onError: (error) => {
 					console.log(error.message);
-					if (error.message === "No subscription found") {
+					if (error.message === "No subscription found.") {
 						toast.info("You need to subsrcibe to query AI");
 						router.push("/upgrade-plan");
 					}
