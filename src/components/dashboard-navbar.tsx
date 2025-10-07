@@ -32,6 +32,7 @@ const DashboardNav = ({
 		INotification[] | null
 	>(notifications?.data?.notifications);
 	const [user, setUser] = useState<any>();
+	console.log(user);
 
 	const { markAsRead } = useMarkAsRead();
 
