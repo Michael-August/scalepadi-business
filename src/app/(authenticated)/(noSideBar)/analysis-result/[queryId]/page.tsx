@@ -20,6 +20,7 @@ import {
 	useGetChallengeById,
 } from "@/hooks/useChallenge";
 import { Button } from "@/components/ui/button";
+import { ChatWindowSkeleton } from "@/components/skeletons/messages.skeleton";
 
 interface IMessage {
 	key: string;
@@ -40,7 +41,7 @@ const AnalysisResultPage = () => {
 
 	const { queryId } = useParams();
 
-	const { challenge: fetchedChallenge } = useGetChallengeById(
+	const { challenge: fetchedChallenge, isLoading } = useGetChallengeById(
 		queryId as string
 	);
 
@@ -281,72 +282,80 @@ const AnalysisResultPage = () => {
 							</span>
 						</div>
 						<div className="max-h-[350px] overflow-y-scroll hide-scrollbar">
-							{messages?.map((msg, idx) => (
-								<motion.div
-									key={idx}
-									initial={{ opacity: 0, y: 10 }}
-									animate={{ opacity: 1, y: 0 }}
-									transition={{ duration: 0.3 }}
-									className={`flex ${
-										msg.role === "user"
-											? "items-end"
-											: "items-start"
-									} gap-3 flex-col`}
-								>
-									{msg.role !== "user" && (
-										<span className="text-[#6C6C89] text-sm">
-											{msg.key}
-										</span>
+							{isLoading && <ChatWindowSkeleton />}
+							{!isLoading && fetchedChallenge && (
+								<div>
+									{messages?.map((msg, idx) => (
+										<motion.div
+											key={idx}
+											initial={{ opacity: 0, y: 10 }}
+											animate={{ opacity: 1, y: 0 }}
+											transition={{ duration: 0.3 }}
+											className={`flex ${
+												msg.role === "user"
+													? "items-end"
+													: "items-start"
+											} gap-3 flex-col`}
+										>
+											{msg.role !== "user" && (
+												<span className="text-[#6C6C89] text-sm">
+													{msg.key}
+												</span>
+											)}
+											<div
+												className={`px-4 py-2 rounded-lg max-w-[80%] text-sm shadow-sm mb-4 ${
+													msg.role === "user"
+														? "bg-[#F7F7F8] text-[#121217]"
+														: "bg-white border border-[#D1DAEC80] text-[#1A1A1A] leading-loose"
+												}`}
+												style={{
+													whiteSpace: "pre-line",
+												}}
+											>
+												{msg.content}
+											</div>
+										</motion.div>
+									))}
+									{/* Assistant Typing */}
+									{isCreatingChallenge && (
+										<div className="px-4 py-3">
+											<div className="flex space-x-2">
+												<span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></span>
+												<span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-200"></span>
+												<span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-400"></span>
+											</div>
+										</div>
 									)}
-									<div
-										className={`px-4 py-2 rounded-lg max-w-[80%] text-sm shadow-sm mb-4 ${
-											msg.role === "user"
-												? "bg-[#F7F7F8] text-[#121217]"
-												: "bg-white border border-[#D1DAEC80] text-[#1A1A1A] leading-loose"
-										}`}
-										style={{ whiteSpace: "pre-line" }}
-									>
-										{msg.content}
+
+									<div className="flex flex-col gap-4 mb-5">
+										{/* <div className="flex flex-col gap-2">
+										<span className="text-sm text-[#1A1A1A]">
+											Suggested Experts
+										</span>
+										<div className="flex items-center"></div>
+									</div> */}
+										<Button
+											onClick={() => {
+												router.push(
+													`/business-setup?challengeId=${
+														fetchedChallenge?.data[
+															fetchedChallenge
+																?.data?.length -
+																1
+														].queryId
+													}&type=create`
+												);
+											}}
+											className="bg-primary text-white w-fit rounded-[14px] px-4 py-6"
+										>
+											Get Started
+										</Button>
 									</div>
-								</motion.div>
-							))}
-							{/* Assistant Typing */}
-							{isCreatingChallenge && (
-								<div className="px-4 py-3">
-									<div className="flex space-x-2">
-										<span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></span>
-										<span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-200"></span>
-										<span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-400"></span>
-									</div>
+
+									{/* Scroll Anchor 👇 */}
+									<div ref={messagesEndRef} />
 								</div>
 							)}
-
-							<div className="flex flex-col gap-4 mb-5">
-								{/* <div className="flex flex-col gap-2">
-									<span className="text-sm text-[#1A1A1A]">
-										Suggested Experts
-									</span>
-									<div className="flex items-center"></div>
-								</div> */}
-								<Button
-									onClick={() => {
-										router.push(
-											`/business-setup?challengeId=${
-												fetchedChallenge?.data[
-													fetchedChallenge?.data
-														?.length - 1
-												].id
-											}&type=create`
-										);
-									}}
-									className="bg-primary text-white w-fit rounded-[14px] px-4 py-6"
-								>
-									Get Started
-								</Button>
-							</div>
-
-							{/* Scroll Anchor 👇 */}
-							<div ref={messagesEndRef} />
 						</div>
 						<div className="pt-6 border-t -mx-4 px-4 lg:-mx-6 lg:px-6 border-[#F2F2F2]">
 							<div className="flex items-center w-full justify-between bg-[#F7F7F8] py-1 px-[6px]">
