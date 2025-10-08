@@ -14,6 +14,7 @@ const ExpertDetails = () => {
     const {expertId} = useParams()
 
     const { expert, isLoading } = useGetExpert(expertId as string)
+    console.log(expert)
 
     const [ openSheet, setOpenSheet ] = useState(false)
 

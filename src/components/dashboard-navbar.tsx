@@ -43,8 +43,8 @@ const DashboardNav = ({
         .map((n: any) => n[0])
         .join("")
         .toUpperCase()
-    : "?";
-  console.log(user);
+    : "B";
+  // console.log(user);
 
   const { markAsRead } = useMarkAsRead();
 

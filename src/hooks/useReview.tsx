@@ -80,29 +80,39 @@ export const useCreateReview = () => {
 };
 
 export const useGetReview = (projectId: string) => {
-  const { data, isLoading } = useQuery({
+  const query = useQuery({
     queryKey: ["review", projectId],
     queryFn: async () => {
       try {
         const response = await axiosClient.get(`/review/${projectId}`);
-        if (response.data?.status === false) {
-          throw new Error(response.data?.message || "Failed to fetch review");
-        }
-        return response.data;
-      } catch (error: any) {
-        if (error instanceof AxiosError) {
-          toast.error(error.response?.data?.message || "Failed to fetch review");
-        } else if (error instanceof Error) {
-          toast.error(error.message);
-        } else {
-          toast.error("An unexpected error occurred while fetching review");
+        const result = response.data;
+        if (result?.status === false && result?.message === "No review found.") {
+          return null; 
         }
 
-        throw error;
+        if (result?.status === false) {
+          toast.error(result?.message || "Failed to fetch review");
+          return null;
+        }
+
+        return result;
+      } catch (err) {
+        const error = err as AxiosError<{ message?: string }>;
+
+        if (error.response?.status === 404) {
+          return null;
+        }
+
+        toast.error(error.response?.data?.message || "Unexpected error fetching review");
+        return null;
       }
     },
     enabled: !!projectId,
   });
 
-  return { review: data, isLoading };
+  return {
+    review: query.data,
+    isLoading: query.isLoading,
+  };
 };
+
