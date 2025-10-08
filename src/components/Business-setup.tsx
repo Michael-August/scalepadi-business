@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { CalendarIcon, Plus, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -24,7 +24,7 @@ import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { format } from "date-fns";
 import { Calendar } from "./ui/calendar";
-import { useCreateChallenge } from "@/hooks/useChallenge";
+import { useCreateChallenge, useGetChallengeById } from "@/hooks/useChallenge";
 import { error } from "console";
 
 // ---- Define types for the form ----
@@ -55,6 +55,8 @@ const BusinessSetUp = () => {
 	const expertName = searchParams.get("expertName");
 	const mode = searchParams.get("type");
 	const challengeId = searchParams.get("challengeId");
+
+	const { challenge } = useGetChallengeById(challengeId as string);
 
 	// const { setBusinessDetails, isPending } = useSetBusinessDetails();
 	const { createproject, isPending: isCreatingProject } = useCreateProject();
@@ -102,6 +104,18 @@ const BusinessSetUp = () => {
 			});
 		}
 	};
+
+	useEffect(() => {
+		const lastChallenge = (challenge?.data ?? [])[
+			challenge?.data?.length - 1
+		];
+
+		methods.reset({
+			...lastChallenge,
+			brief: lastChallenge?.description,
+			dueDate: lastChallenge?.start_timeline,
+		});
+	}, [challengeId]);
 
 	return (
 		<div className="flex w-full flex-col gap-10">
