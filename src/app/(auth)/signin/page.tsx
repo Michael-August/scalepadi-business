@@ -48,14 +48,14 @@ const SignIn = () => {
             onSuccess: (res) => {
                 console.log(res);
                 localStorage.setItem("token", res.data.token);
-                toast.success("Login successful");
+                toast.success(res?.message || "Login successful");
                 reset();
                 router.replace('/workspace');
             },
-            onError: (error) => {
-                toast.error(error.message || "An error occurred during login");
-                console.error("Login error:", error);
-            }
+            // onError: (error) => {
+            //     toast.error(error.message || "An error occurred during login");
+            //     console.error("Login error:", error);
+            // }
         });
     }
 

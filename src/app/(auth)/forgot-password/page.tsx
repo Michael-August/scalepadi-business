@@ -35,13 +35,9 @@ const ForgotPassword = () => {
             onSuccess: (res) => {
                 console.log(res);
                 localStorage.setItem("newUserEmail", data.email)
-                toast.success("OTP sent");
+                toast.success(res.message || "OTP sent");
                 reset();
                 router.replace('/reset-password');
-            },
-            onError: (error) => {
-                toast.error(error.message || "An error occurred during forgot password");
-                console.error("Forgot password error:", error);
             }
         });
     }
