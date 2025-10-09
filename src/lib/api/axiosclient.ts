@@ -31,7 +31,7 @@ axiosClient.interceptors.request.use(
 
 		if (!token) {
 			window.location.href = "/signin";
-			throw new Error("No access token found in session");
+			throw new Error("Session Expired");
 		}
 
 		if (token && config.headers) {
@@ -64,6 +64,7 @@ axiosClient.interceptors.response.use(
 			}
 
 			if (status === 403 && message === "Access Denied: Invalid Token.") {
+				toast.error("Session expired");
 				localStorage.clear();
 				window.location.href = "/signin";
 			}
