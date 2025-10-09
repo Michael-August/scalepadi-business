@@ -83,7 +83,7 @@ export function HireCard({ hire }: { hire: Hire }) {
 	const componentProps = {
 		reference: new Date().getTime().toString(),
 		email: user?.email,
-		amount: hire?.commissionDue && ((hire?.commissionDue * 5) / 100) * 100,
+		amount: hire?.commissionDue && hire?.commissionDue * 100,
 		publicKey,
 		text: "Make Payment",
 		metadata: {
