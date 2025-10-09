@@ -50,13 +50,9 @@ const ResetPassword = () => {
             onSuccess: (res) => {
                 console.log(res);
                 localStorage.removeItem("random")
-                toast.success("Password reset successful");
+                toast.success(res.message || "Password reset successful");
                 reset();
                 router.replace('/signin');
-            },
-            onError: (error) => {
-                toast.error(error.message || "An error occurred during reset password");
-                console.error("Reset password error:", error);
             }
         });
     }

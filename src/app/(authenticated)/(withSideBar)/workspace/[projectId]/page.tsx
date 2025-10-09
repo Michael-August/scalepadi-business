@@ -17,12 +17,25 @@ import {
 import { useEffect, useState, ChangeEvent } from "react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
-import { useGetProject, useGetTasksForProject, useUpdateTaskChanges } from "@/hooks/useProject";
+import {
+  useGetProject,
+  useGetTasksForProject,
+  useUpdateTaskChanges,
+} from "@/hooks/useProject";
 import { useCreateReview, useGetReview } from "@/hooks/useReview";
 import moment from "moment";
 import { PaystackButton } from "react-paystack";
 import { toast } from "sonner";
 import { noAvatar } from "@/lib/constatnts";
+import { useMakeEnquiry } from "@/hooks/usePlan";
+import { useForm } from "react-hook-form";
+
+type InquiryFormValues = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  note: string;
+};
 
 const ProjectDetails = () => {
   const [activeTab, setActiveTab] = useState<"projectOverview" | "taskTracker">(
@@ -40,6 +53,46 @@ const ProjectDetails = () => {
   const [user, setUser] = useState<any>();
 
   const router = useRouter();
+
+  const [userInquiryDetails, setUserInquiryDetails] = useState<{
+    firstName: string;
+    lastName: string;
+    email: string;
+  }>();
+  console.log(userInquiryDetails);
+
+  const { makeEnquiry, isPending } = useMakeEnquiry();
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm<InquiryFormValues>();
+
+  useEffect(() => {
+    if (user?.name) {
+      const nameParts = user.name.trim().split(" ");
+      const firstName = nameParts[0];
+      const lastName = nameParts.length === 1 ? nameParts[0] : nameParts[1];
+
+      setValue("firstName", firstName);
+      setValue("lastName", lastName);
+      setValue("email", user.email || "");
+    }
+  }, [user, setValue]);
+
+  const onSubmit = (data: InquiryFormValues) => {
+    makeEnquiry(
+      { ...data, note },
+      {
+        onSuccess: () => {
+          toast.success("Enquiry submitted successfully");
+          setOpenRejectReason(false); // close modal
+        },
+      }
+    );
+  };
 
   const [openReview, setOpenReview] = useState(false);
   const [openRejectReason, setOpenRejectReason] = useState(false);
@@ -59,12 +112,13 @@ const ProjectDetails = () => {
       setOpenReview(false);
       setSelectedTaskId(null);
     },
-    onError: () => {
-    },
+    onError: () => {},
   });
 
   const createReviewMutation = useCreateReview();
-  const { review, isLoading: isLoadingReview } = useGetReview(projectId as string);
+  const { review, isLoading: isLoadingReview } = useGetReview(
+    projectId as string
+  );
 
   const handleStatusUpdate = (
     status: "approved" | "needs-changes",
@@ -105,47 +159,47 @@ const ProjectDetails = () => {
     setOpenReview(false);
   };
 
-	const componentProps = {
-		reference: new Date().getTime().toString(),
-		email: user?.email,
-		amount:
-			project?.data?.totalCost &&
-			parseFloat(project?.data?.totalCost) * 100,
-		publicKey,
-		text: "Make Payment",
-		metadata: {
-			custom_fields: [
-				{
-					display_name: "Type",
-					variable_name: "type",
-					value: "project",
-				},
-				{
-					display_name: "Business Id",
-					variable_name: "businessId",
-					value: `${user?.id}`,
-				},
-				{
-					display_name: "Project Id",
-					variable_name: "projectId",
-					value: `${project?.data?.id}`,
-				},
-				{
-					display_name: "Amount",
-					variable_name: "amount",
-					value: `${project?.data?.totalCost}`,
-				},
-			],
-		},
-		onSuccess: (response: any) => {
-			toast.success("Payment successful!");
-		},
-	};
+  const componentProps = {
+    reference: new Date().getTime().toString(),
+    email: user?.email,
+    amount:
+      project?.data?.totalCost && parseFloat(project?.data?.totalCost) * 100,
+    publicKey,
+    text: "Make Payment",
+    metadata: {
+      custom_fields: [
+        {
+          display_name: "Type",
+          variable_name: "type",
+          value: "project",
+        },
+        {
+          display_name: "Business Id",
+          variable_name: "businessId",
+          value: `${user?.id}`,
+        },
+        {
+          display_name: "Project Id",
+          variable_name: "projectId",
+          value: `${project?.data?.id}`,
+        },
+        {
+          display_name: "Amount",
+          variable_name: "amount",
+          value: `${project?.data?.totalCost}`,
+        },
+      ],
+    },
+    onSuccess: (response: any) => {
+      toast.success("Payment successful!");
+    },
+  };
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
       setUser(JSON.parse(storedUser));
+      setUserInquiryDetails(JSON.parse(storedUser));
     }
   }, []);
 
@@ -223,22 +277,21 @@ const ProjectDetails = () => {
         </div>
       </div>
 
-			{project?.data?.totalCost &&
-				(project?.data?.paymentStatus === "pending" ||
-					project?.data?.paymentStatus === "cancelled") && (
-					<PaystackButton
-						{...componentProps}
-						className="text-white bg-primary py-2 px-3 rounded-[14px] w-fit hover:bg-primary-hover hover:text-black"
-					/>
-				)}
-			{project?.data?.totalCost &&
-				(project?.data?.paymentStatus === "pending" ||
-					project?.data?.paymentStatus === "cancelled") && (
-					<span className="text-sm text-green-700">
-						Proposed Price: ₦
-						{project?.data?.totalCost.toLocaleString()}
-					</span>
-				)}
+      {project?.data?.totalCost &&
+        (project?.data?.paymentStatus === "pending" ||
+          project?.data?.paymentStatus === "cancelled") && (
+          <PaystackButton
+            {...componentProps}
+            className="text-white bg-primary py-2 px-3 rounded-[14px] w-fit hover:bg-primary-hover hover:text-black"
+          />
+        )}
+      {project?.data?.totalCost &&
+        (project?.data?.paymentStatus === "pending" ||
+          project?.data?.paymentStatus === "cancelled") && (
+          <span className="text-sm text-green-700">
+            Proposed Price: ₦{project?.data?.totalCost.toLocaleString()}
+          </span>
+        )}
 
       <div className="project-details w-full lg:w-[895px] pb-10">
         <div className="tab pt-2 w-full flex items-center gap-5 bg-[#F9FAFB]">
@@ -555,18 +608,25 @@ const ProjectDetails = () => {
                                             <span className="text-sm text-[#727374]">{task?.additionalNotes}</span>
                                         </div> */}
 
-                      <div className="flex items-center justify-end gap-3">
-                        <Button
-                          onClick={() => {
-                            setSelectedTaskId(task.id);
-                            setOpenRejectReason(true);
-                          }}
-                          variant={"outline"}
-                          className="border-red-500 text-red-600 rounded-[14px] hover:text-red-800"
-                        >
-                          Reject
-                        </Button>
-                        {task?.status === "approved" && (
+                      {task?.status === "approved" && (
+                        <div className="flex items-center justify-end gap-3">
+                          {/* <Button
+                            onClick={() => {
+                              setSelectedTaskId(task.id);
+                              setOpenRejectReason(true);
+                            }}
+                            variant={"outline"}
+                            className="border-red-500 text-red-600 rounded-[14px] hover:text-red-800"
+                          >
+                            Make Inquiry
+                          </Button> */}
+                          <Button
+                            variant="outline"
+                            className="bg-primary-hover border-primary-hover rounded-[14px] text-black hover:bg-primary hover:text-white"
+                            onClick={() => setOpenRejectReason(true)}
+                          >
+                            Make Inquiry
+                          </Button>
                           <Button
                             onClick={() => {
                               setSelectedTaskId(task.id);
@@ -576,8 +636,8 @@ const ProjectDetails = () => {
                           >
                             Review
                           </Button>
-                        )}
-                      </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -651,7 +711,7 @@ const ProjectDetails = () => {
                 <span className="text-[#878A93] text-sm">
                   Your review for this project
                 </span>
-                
+
                 {/* Display existing rating */}
                 <div className="flex items-center justify-center gap-2">
                   {[1, 2, 3, 4, 5].map((star) => (
@@ -675,7 +735,8 @@ const ProjectDetails = () => {
 
                 <div className="flex flex-col gap-1">
                   <div className="text-sm text-[#878A93] text-center">
-                    Review submitted on {moment(review?.data?.createdAt).format("MMMM DD, YYYY")}
+                    Review submitted on{" "}
+                    {moment(review?.data?.createdAt).format("MMMM DD, YYYY")}
                   </div>
                   <div className="text-xs text-[#878A93] text-center">
                     By: {review?.data?.by?.name} ({review?.data?.by?.email})
@@ -686,10 +747,10 @@ const ProjectDetails = () => {
               // Show review form
               <>
                 <span className="text-[#878A93] text-sm">
-                  Your project was recently completed and we will like for you to
-                  leave a feedback and performance review for the expert
+                  Your project was recently completed and we will like for you
+                  to leave a feedback and performance review for the expert
                 </span>
-                
+
                 {/* Interactive Star Rating */}
                 <div className="flex items-center justify-center gap-2">
                   {[1, 2, 3, 4, 5].map((star) => (
@@ -707,20 +768,24 @@ const ProjectDetails = () => {
 
                 <div className="form-group flex flex-col gap-2">
                   <Label>Write your feedback</Label>
-                  <Textarea 
+                  <Textarea
                     value={reviewDescription}
-                    onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setReviewDescription(e.target.value)}
-                    className="rounded-[14px] py-6 px-4 border border-[#D1DAEC]" 
+                    onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
+                      setReviewDescription(e.target.value)
+                    }
+                    className="rounded-[14px] py-6 px-4 border border-[#D1DAEC]"
                     placeholder="Share your experience with the expert..."
                   />
                 </div>
 
-                <Button 
+                <Button
                   onClick={handleReviewSubmit}
                   disabled={createReviewMutation.isPending}
                   className="bg-primary text-white py-6 rounded-[14px] w-fit hover:bg-primary-hover hover:text-black disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {createReviewMutation.isPending ? "Submitting..." : "Submit review"}
+                  {createReviewMutation.isPending
+                    ? "Submitting..."
+                    : "Submit review"}
                 </Button>
               </>
             )}
@@ -729,6 +794,45 @@ const ProjectDetails = () => {
       </Dialog>
 
       <Dialog open={openRejectReason} onOpenChange={setOpenRejectReason}>
+        <DialogContent className="!rounded-3xl">
+          <DialogTitle className="text-primary text-[20px]">
+            Request Update
+          </DialogTitle>
+
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="flex flex-col gap-6"
+          >
+            <span className="text-[#878A93] text-sm">
+              Kindly write detailed information about your inquiry.
+            </span>
+
+            {/* Hidden inputs for prefilled user info */}
+            <input type="hidden" {...register("firstName")} />
+            <input type="hidden" {...register("lastName")} />
+            <input type="hidden" {...register("email")} />
+
+            <div className="form-group flex flex-col gap-2">
+              <Label>Write your feedback</Label>
+              <Textarea
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                className="rounded-[14px] py-6 px-4 border border-[#D1DAEC]"
+              />
+            </div>
+
+            <Button
+              type="submit"
+              className="bg-primary text-white py-6 rounded-[14px] w-fit hover:bg-primary-hover hover:text-black"
+              disabled={isPending}
+            >
+              {isPending ? "Submitting..." : "Submit Request"}
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* <Dialog open={openRejectReason} onOpenChange={setOpenRejectReason}>
         <DialogContent className="!rounded-3xl">
           <DialogTitle className="text-primary text-[20px]">
             Request update
@@ -741,14 +845,16 @@ const ProjectDetails = () => {
             </span>
             <div className="form-group flex flex-col gap-2">
               <Label>Write your feedback</Label>
-              <Textarea 
+              <Textarea
                 value={note}
-                onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setNote(e.target.value)}
-                className="rounded-[14px] py-6 px-4 border border-[#D1DAEC]" 
+                onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
+                  setNote(e.target.value)
+                }
+                className="rounded-[14px] py-6 px-4 border border-[#D1DAEC]"
               />
             </div>
 
-            <Button 
+            <Button
               onClick={() => {
                 if (selectedTaskId) {
                   handleStatusUpdate("needs-changes", note, selectedTaskId);
@@ -760,7 +866,7 @@ const ProjectDetails = () => {
             </Button>
           </div>
         </DialogContent>
-      </Dialog>
+      </Dialog> */}
     </div>
   );
 };
