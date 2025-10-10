@@ -28,4 +28,5 @@ export interface IExpert {
     country: string;
     state: string;
     id: string;
+    expertId: string;
 }

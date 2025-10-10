@@ -50,7 +50,8 @@ const SignIn = () => {
                 localStorage.setItem("token", res.data.token);
                 toast.success(res?.message || "Login successful");
                 reset();
-                router.replace('/workspace');
+                router.push("/ai-business-query");
+                // router.replace('/workspace');
             },
             // onError: (error) => {
             //     toast.error(error.message || "An error occurred during login");

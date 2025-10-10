@@ -39,9 +39,15 @@ export interface Review {
   data: ReviewData;
 }
 
+export interface ExpertRateData {
+  expertId: string;
+  score: number;
+  note: string;
+}
+
 export const useCreateReview = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: async (data: CreateReviewData) => {
       try {
@@ -61,15 +67,15 @@ export const useCreateReview = () => {
       }
     },
     onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["review", variables.projectId] });
+      queryClient.invalidateQueries({
+        queryKey: ["review", variables.projectId],
+      });
       queryClient.invalidateQueries({ queryKey: ["reviews"] });
       toast.success("Review submitted successfully!");
     },
     onError: (error: any) => {
       if (error instanceof AxiosError) {
-        toast.error(
-          error.response?.data?.message || "Failed to submit review"
-        );
+        toast.error(error.response?.data?.message || "Failed to submit review");
       } else if (error instanceof Error) {
         toast.error(error.message);
       } else {
@@ -86,8 +92,11 @@ export const useGetReview = (projectId: string) => {
       try {
         const response = await axiosClient.get(`/review/${projectId}`);
         const result = response.data;
-        if (result?.status === false && result?.message === "No review found.") {
-          return null; 
+        if (
+          result?.status === false &&
+          result?.message === "No review found."
+        ) {
+          return null;
         }
 
         if (result?.status === false) {
@@ -103,7 +112,9 @@ export const useGetReview = (projectId: string) => {
           return null;
         }
 
-        toast.error(error.response?.data?.message || "Unexpected error fetching review");
+        toast.error(
+          error.response?.data?.message || "Unexpected error fetching review"
+        );
         return null;
       }
     },
@@ -116,3 +127,106 @@ export const useGetReview = (projectId: string) => {
   };
 };
 
+export const useRateExpert = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: ExpertRateData) => {
+      try {
+        const response = await axiosClient.post("/expert-review", data);
+        if (response.data?.status === false) {
+          throw new Error(response.data?.message || "Failed to create review");
+        }
+        console.log(response.data);
+        return response.data;
+      } catch (error: any) {
+        const backendMessage =
+          error?.response?.data?.message ||
+          error?.message ||
+          "An error occurred during review creation";
+
+        throw new Error(backendMessage);
+      }
+    },
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["review", variables.expertId] });
+      queryClient.invalidateQueries({ queryKey: ["reviews"] });
+      toast.success("Review submitted successfully!");
+    },
+    onError: (error: any) => {
+      if (error instanceof AxiosError) {
+        toast.error(error.response?.data?.message || "Failed to submit review");
+      } else if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("An unexpected error occurred while submitting review");
+      }
+    },
+  });
+};
+
+export const useExpertReview = (expertId: string) => {
+  const query = useQuery({
+    queryKey: ["review", expertId],
+    queryFn: async () => {
+      try {
+        const response = await axiosClient.get(
+          `/expert-reviews/${expertId}/business`
+        );
+        const result = response.data;
+        if (
+          result?.status === false &&
+          result?.message === "No review found."
+        ) {
+          return null;
+        }
+
+        if (result?.status === false) {
+          toast.error(result?.message || "Failed to fetch review");
+          return null;
+        }
+        console.log(result);
+        return result;
+      } catch (err) {
+        const error = err as AxiosError<{ message?: string }>;
+
+        if (error.response?.status === 404) {
+          return null;
+        }
+
+        toast.error(
+          error.response?.data?.message || "Unexpected error fetching review"
+        );
+        return null;
+      }
+    },
+    enabled: !!expertId,
+  });
+
+  return {
+    review: query.data,
+    isLoading: query.isLoading,
+  };
+};
+
+// Helper function to fetch review for a single expert
+export const fetchExpertReview = async (expertId: string) => {
+  try {
+    const response = await axiosClient.get(
+      `/expert-reviews/${expertId}/business`
+    );
+    const result = response.data;
+    
+    if (result?.status === false && result?.message === "No review found.") {
+      return { expertId, review: null };
+    }
+
+    if (result?.status === false) {
+      return { expertId, review: null };
+    }
+    
+    return { expertId, review: result };
+  } catch (err) {
+    return { expertId, review: null };
+  }
+}
