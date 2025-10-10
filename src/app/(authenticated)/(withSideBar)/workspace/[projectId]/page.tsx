@@ -22,9 +22,9 @@ import { useEffect, useState, ChangeEvent } from "react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import {
-  useGetProject,
-  useGetTasksForProject,
-  useUpdateTaskChanges,
+	useGetProject,
+	useGetTasksForProject,
+	useUpdateTaskChanges,
 } from "@/hooks/useProject";
 import {
   useCreateReview,
@@ -38,12 +38,13 @@ import { toast } from "sonner";
 import { noAvatar } from "@/lib/constatnts";
 import { useMakeEnquiry } from "@/hooks/usePlan";
 import { useForm } from "react-hook-form";
+import { useQueryClient } from "@tanstack/react-query";
 
 type InquiryFormValues = {
-  firstName: string;
-  lastName: string;
-  email: string;
-  note: string;
+	firstName: string;
+	lastName: string;
+	email: string;
+	note: string;
 };
 
 const ProjectDetails = () => {
@@ -52,16 +53,16 @@ const ProjectDetails = () => {
   >("projectOverview");
   const publicKey = process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY!;
 
-  const { projectId } = useParams();
+	const { projectId } = useParams();
 
   const { project } = useGetProject(projectId as string);
   const { tasks, isLoading: isLoadingTasks } = useGetTasksForProject(
     projectId as string
   );
 
-  const [user, setUser] = useState<any>();
+	const [user, setUser] = useState<any>();
 
-  const router = useRouter();
+	const router = useRouter();
 
   const [userInquiryDetails, setUserInquiryDetails] = useState<{
     firstName: string;
@@ -69,14 +70,16 @@ const ProjectDetails = () => {
     email: string;
   }>();
 
-  const { makeEnquiry, isPending } = useMakeEnquiry();
+	const { makeEnquiry, isPending } = useMakeEnquiry();
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    formState: { errors },
-  } = useForm<InquiryFormValues>();
+	const queryClient = useQueryClient();
+
+	const {
+		register,
+		handleSubmit,
+		setValue,
+		formState: { errors },
+	} = useForm<InquiryFormValues>();
 
   useEffect(() => {
     if (user?.name) {
@@ -84,11 +87,11 @@ const ProjectDetails = () => {
       const firstName = nameParts[0];
       const lastName = nameParts.length === 1 ? nameParts[0] : nameParts[1];
 
-      setValue("firstName", firstName);
-      setValue("lastName", lastName);
-      setValue("email", user.email || "");
-    }
-  }, [user, setValue]);
+			setValue("firstName", firstName);
+			setValue("lastName", lastName);
+			setValue("email", user.email || "");
+		}
+	}, [user, setValue]);
 
   const onSubmit = (data: InquiryFormValues) => {
     makeEnquiry(
@@ -116,16 +119,16 @@ const ProjectDetails = () => {
   const [expertRating, setExpertRating] = useState<number>(0);
   const [expertReviewDescription, setExpertReviewDescription] = useState("");
 
-  const updateTaskChangesMutation = useUpdateTaskChanges({
-    onSuccess: () => {
-      setShowNoteInput(null);
-      setNote("");
-      setOpenRejectReason(false);
-      setOpenReview(false);
-      setSelectedTaskId(null);
-    },
-    onError: () => {},
-  });
+	const updateTaskChangesMutation = useUpdateTaskChanges({
+		onSuccess: () => {
+			setShowNoteInput(null);
+			setNote("");
+			setOpenRejectReason(false);
+			setOpenReview(false);
+			setSelectedTaskId(null);
+		},
+		onError: () => {},
+	});
 
   const createReviewMutation = useCreateReview();
   const { review } = useGetReview(projectId as string);
@@ -136,39 +139,39 @@ const ProjectDetails = () => {
     selectedExpert?.id?.id || ""
   );
 
-  const handleStatusUpdate = (
-    status: "approved" | "needs-changes",
-    note: string,
-    taskId: string
-  ) => {
-    if (!note.trim()) {
-      toast.error("Please enter a note before submitting.");
-      return;
-    }
+	const handleStatusUpdate = (
+		status: "approved" | "needs-changes",
+		note: string,
+		taskId: string
+	) => {
+		if (!note.trim()) {
+			toast.error("Please enter a note before submitting.");
+			return;
+		}
 
-    updateTaskChangesMutation.mutate({
-      taskId: taskId,
-      status: status,
-      note: note.trim(),
-    });
-  };
+		updateTaskChangesMutation.mutate({
+			taskId: taskId,
+			status: status,
+			note: note.trim(),
+		});
+	};
 
-  const handleReviewSubmit = () => {
-    if (rating === 0) {
-      toast.error("Please select a rating before submitting.");
-      return;
-    }
+	const handleReviewSubmit = () => {
+		if (rating === 0) {
+			toast.error("Please select a rating before submitting.");
+			return;
+		}
 
-    if (!reviewDescription.trim()) {
-      toast.error("Please enter a review description before submitting.");
-      return;
-    }
+		if (!reviewDescription.trim()) {
+			toast.error("Please enter a review description before submitting.");
+			return;
+		}
 
-    createReviewMutation.mutate({
-      projectId: projectId as string,
-      rating: rating,
-      description: reviewDescription.trim(),
-    });
+		createReviewMutation.mutate({
+			projectId: projectId as string,
+			rating: rating,
+			description: reviewDescription.trim(),
+		});
 
     setRating(0);
     setReviewDescription("");
@@ -224,49 +227,53 @@ const ProjectDetails = () => {
     setOpenReview(true);
   };
 
-  const componentProps = {
-    reference: new Date().getTime().toString(),
-    email: user?.email,
-    amount:
-      project?.data?.totalCost && parseFloat(project?.data?.totalCost) * 100,
-    publicKey,
-    text: "Make Payment",
-    metadata: {
-      custom_fields: [
-        {
-          display_name: "Type",
-          variable_name: "type",
-          value: "project",
-        },
-        {
-          display_name: "Business Id",
-          variable_name: "businessId",
-          value: `${user?.id}`,
-        },
-        {
-          display_name: "Project Id",
-          variable_name: "projectId",
-          value: `${project?.data?.id}`,
-        },
-        {
-          display_name: "Amount",
-          variable_name: "amount",
-          value: `${project?.data?.totalCost}`,
-        },
-      ],
-    },
-    onSuccess: (response: any) => {
-      toast.success("Payment successful!");
-    },
-  };
+	const componentProps = {
+		reference: new Date().getTime().toString(),
+		email: user?.email,
+		amount:
+			project?.data?.totalCost &&
+			parseFloat(project?.data?.totalCost) * 100,
+		publicKey,
+		text: "Make Payment",
+		metadata: {
+			custom_fields: [
+				{
+					display_name: "Type",
+					variable_name: "type",
+					value: "project",
+				},
+				{
+					display_name: "Business Id",
+					variable_name: "businessId",
+					value: `${user?.id}`,
+				},
+				{
+					display_name: "Project Id",
+					variable_name: "projectId",
+					value: `${project?.data?.id}`,
+				},
+				{
+					display_name: "Amount",
+					variable_name: "amount",
+					value: `${project?.data?.totalCost}`,
+				},
+			],
+		},
+		onSuccess: (response: any) => {
+			toast.success("Payment successful!");
+			queryClient.invalidateQueries({
+				queryKey: ["projects", projectId],
+			});
+		},
+	};
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-      setUserInquiryDetails(JSON.parse(storedUser));
-    }
-  }, []);
+	useEffect(() => {
+		const storedUser = localStorage.getItem("user");
+		if (storedUser) {
+			setUser(JSON.parse(storedUser));
+			setUserInquiryDetails(JSON.parse(storedUser));
+		}
+	}, []);
 
   const userExpertRating = expertReview?.data?.ratings?.find(
     (rating: any) => rating.ratingBy === user?.id
@@ -830,26 +837,26 @@ const ProjectDetails = () => {
                   Your review for this project
                 </span>
 
-                {/* Display existing rating */}
-                <div className="flex items-center justify-center gap-2">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star
-                      key={star}
-                      className={`w-[32px] h-[32px] ${
-                        star <= review?.data?.rating
-                          ? "text-[#F2BB05] fill-[#F6CF50]"
-                          : "text-[#CFD0D4] fill-[#E7ECEE]"
-                      }`}
-                    />
-                  ))}
-                </div>
+								{/* Display existing rating */}
+								<div className="flex items-center justify-center gap-2">
+									{[1, 2, 3, 4, 5].map((star) => (
+										<Star
+											key={star}
+											className={`w-[32px] h-[32px] ${
+												star <= review?.data?.rating
+													? "text-[#F2BB05] fill-[#F6CF50]"
+													: "text-[#CFD0D4] fill-[#E7ECEE]"
+											}`}
+										/>
+									))}
+								</div>
 
-                <div className="flex flex-col gap-2">
-                  <Label>Your feedback</Label>
-                  <div className="rounded-[14px] py-6 px-4 border border-[#D1DAEC] bg-gray-50">
-                    {review?.data?.description}
-                  </div>
-                </div>
+								<div className="flex flex-col gap-2">
+									<Label>Your feedback</Label>
+									<div className="rounded-[14px] py-6 px-4 border border-[#D1DAEC] bg-gray-50">
+										{review?.data?.description}
+									</div>
+								</div>
 
                 <div className="flex flex-col gap-1">
                   <div className="text-sm text-[#878A93] text-center">
@@ -869,32 +876,34 @@ const ProjectDetails = () => {
                   to leave a feedback and performance review for the expert
                 </span>
 
-                {/* Interactive Star Rating */}
-                <div className="flex items-center justify-center gap-2">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star
-                      key={star}
-                      className={`w-[32px] h-[32px] cursor-pointer transition-colors ${
-                        star <= rating
-                          ? "text-[#F2BB05] fill-[#F6CF50]"
-                          : "text-[#CFD0D4] fill-[#E7ECEE]"
-                      }`}
-                      onClick={() => setRating(star)}
-                    />
-                  ))}
-                </div>
+								{/* Interactive Star Rating */}
+								<div className="flex items-center justify-center gap-2">
+									{[1, 2, 3, 4, 5].map((star) => (
+										<Star
+											key={star}
+											className={`w-[32px] h-[32px] cursor-pointer transition-colors ${
+												star <= rating
+													? "text-[#F2BB05] fill-[#F6CF50]"
+													: "text-[#CFD0D4] fill-[#E7ECEE]"
+											}`}
+											onClick={() => setRating(star)}
+										/>
+									))}
+								</div>
 
-                <div className="form-group flex flex-col gap-2">
-                  <Label>Write your feedback</Label>
-                  <Textarea
-                    value={reviewDescription}
-                    onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
-                      setReviewDescription(e.target.value)
-                    }
-                    className="rounded-[14px] py-6 px-4 border border-[#D1DAEC]"
-                    placeholder="Share your experience with the expert..."
-                  />
-                </div>
+								<div className="form-group flex flex-col gap-2">
+									<Label>Write your feedback</Label>
+									<Textarea
+										value={reviewDescription}
+										onChange={(
+											e: ChangeEvent<HTMLTextAreaElement>
+										) =>
+											setReviewDescription(e.target.value)
+										}
+										className="rounded-[14px] py-6 px-4 border border-[#D1DAEC]"
+										placeholder="Share your experience with the expert..."
+									/>
+								</div>
 
                 <Button
                   onClick={handleReviewSubmit}
@@ -1038,33 +1047,34 @@ const ProjectDetails = () => {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={openRejectReason} onOpenChange={setOpenRejectReason}>
-        <DialogContent className="!rounded-3xl">
-          <DialogTitle className="text-primary text-[20px]">
-            Request Update
-          </DialogTitle>
+			<Dialog open={openRejectReason} onOpenChange={setOpenRejectReason}>
+				<DialogContent className="!rounded-3xl">
+					<DialogTitle className="text-primary text-[20px]">
+						Request Update
+					</DialogTitle>
 
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="flex flex-col gap-6"
-          >
-            <span className="text-[#878A93] text-sm">
-              Kindly write detailed information about your inquiry.
-            </span>
+					<form
+						onSubmit={handleSubmit(onSubmit)}
+						className="flex flex-col gap-6"
+					>
+						<span className="text-[#878A93] text-sm">
+							Kindly write detailed information about your
+							inquiry.
+						</span>
 
-            {/* Hidden inputs for prefilled user info */}
-            <input type="hidden" {...register("firstName")} />
-            <input type="hidden" {...register("lastName")} />
-            <input type="hidden" {...register("email")} />
+						{/* Hidden inputs for prefilled user info */}
+						<input type="hidden" {...register("firstName")} />
+						<input type="hidden" {...register("lastName")} />
+						<input type="hidden" {...register("email")} />
 
-            <div className="form-group flex flex-col gap-2">
-              <Label>Write your feedback</Label>
-              <Textarea
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-                className="rounded-[14px] py-6 px-4 border border-[#D1DAEC]"
-              />
-            </div>
+						<div className="form-group flex flex-col gap-2">
+							<Label>Write your feedback</Label>
+							<Textarea
+								value={note}
+								onChange={(e) => setNote(e.target.value)}
+								className="rounded-[14px] py-6 px-4 border border-[#D1DAEC]"
+							/>
+						</div>
 
             <Button
               type="submit"

@@ -27,6 +27,7 @@ interface Hire {
 	description: string;
 	duration: string;
 	budget: number;
+	commissionDue: number;
 	businessStatus: string;
 	expertStatus: string;
 	adminStatus: string;
@@ -82,7 +83,7 @@ export function HireCard({ hire }: { hire: Hire }) {
 	const componentProps = {
 		reference: new Date().getTime().toString(),
 		email: user?.email,
-		amount: hire?.budget && ((hire?.budget * 5) / 100) * 100,
+		amount: hire?.commissionDue && hire?.commissionDue * 100,
 		publicKey,
 		text: "Make Payment",
 		metadata: {
@@ -105,7 +106,7 @@ export function HireCard({ hire }: { hire: Hire }) {
 				{
 					display_name: "Amount",
 					variable_name: "amount",
-					value: `${hire?.budget}`,
+					value: `${hire?.commissionDue}`,
 				},
 			],
 		},
@@ -146,7 +147,9 @@ export function HireCard({ hire }: { hire: Hire }) {
 									<span>{hire.duration}</span>
 								</div>
 								<div className="flex items-center gap-1">
-									<span>{formatCurrency(hire.budget)}</span>
+									<span>
+										{formatCurrency(hire.commissionDue)}
+									</span>
 								</div>
 								<div className="flex items-center gap-1">
 									<Clock className="h-4 w-4" />
@@ -184,7 +187,7 @@ export function HireCard({ hire }: { hire: Hire }) {
 											{hire.expertStatus}
 										</Badge>
 									</div>
-									<div className="flex items-center justify-between gap-2">
+									{/* <div className="flex items-center justify-between gap-2">
 										<span className="text-xs text-muted-foreground">
 											{"Admin:"}
 										</span>
@@ -194,7 +197,7 @@ export function HireCard({ hire }: { hire: Hire }) {
 										>
 											{hire.adminStatus}
 										</Badge>
-									</div>
+									</div> */}
 								</div>
 							</div>
 						</div>
@@ -213,7 +216,7 @@ export function HireCard({ hire }: { hire: Hire }) {
                 </DropdownMenu> */}
 			</div>
 			{hire?.expertStatus === "accepted" &&
-				hire?.businessStatus === "requested" && (
+				hire?.businessStatus === "awaiting-payment" && (
 					<PaystackButton
 						{...componentProps}
 						className="text-white bg-primary py-2 px-3 rounded-[14px] w-fit hover:bg-primary-hover hover:text-black mt-4"
