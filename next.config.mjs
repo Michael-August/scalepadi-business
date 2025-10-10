@@ -14,6 +14,10 @@ const nextConfig = {
 				protocol: "https",
 				hostname: "www.shutterstock.com", // for no tasks image
 			},
+			{
+				protocol: "https",
+				hostname: "res.cloudinary.com", // for cloudinary
+			},
 		],
 	},
 };
