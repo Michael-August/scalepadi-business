@@ -26,7 +26,7 @@ const SideBar = ({ onLinkClick }: { onLinkClick?: () => void }) => {
   return (
     <>
       {/* DESKTOP SIDEBAR */}
-      <div className="hidden md:flex flex-col w-[250px] px-[18px] py-[30px] md:h-full">
+      <div className="flex flex-col w-[250px] px-[18px] py-[30px] h-full">
         {/* Sticky Logo */}
         <div className="flex-shrink-0 mb-10">
           <Image src="/logo.svg" alt="Logo" width={137.7} height={28} />
@@ -103,7 +103,7 @@ const SideBar = ({ onLinkClick }: { onLinkClick?: () => void }) => {
       </div>
 
       {/* MOBILE BOTTOM NAV */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-[#EDEEF3] flex justify-around py-2 z-50">
+      {/* <div className="hidden fixed bottom-0 left-0 right-0 bg-white border-t border-[#EDEEF3] justify-around py-2 z-50">
         {Routes.slice(0, 4).map((route) => {
           const isActive = pathname.startsWith(route.route);
           return (
@@ -119,7 +119,7 @@ const SideBar = ({ onLinkClick }: { onLinkClick?: () => void }) => {
             </Link>
           );
         })}
-      </div>
+      </div> */}
     </>
   );
 };

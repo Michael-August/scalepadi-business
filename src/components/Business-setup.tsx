@@ -34,6 +34,7 @@ type FormValues = {
   brief: string;
   goal?: string;
   dueDate?: string | Date;
+  requestSupervisor: boolean;
 };
 
 const BusinessSetUp = () => {
@@ -46,17 +47,18 @@ const BusinessSetUp = () => {
       brief: "",
       goal: "",
       dueDate: undefined,
+      requestSupervisor: false,
     },
   });
 
-	const router = useRouter();
-	const searchParams = useSearchParams();
-	const comingFromExpert = searchParams.get("route");
-	const expertName = searchParams.get("expertName");
-	const mode = searchParams.get("type");
-	const challengeId = searchParams.get("challengeId");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const comingFromExpert = searchParams.get("route");
+  const expertName = searchParams.get("expertName");
+  const mode = searchParams.get("type");
+  const challengeId = searchParams.get("challengeId");
 
-	const { challenge } = useGetChallengeById(challengeId as string);
+  const { challenge } = useGetChallengeById(challengeId as string);
 
   // const { setBusinessDetails, isPending } = useSetBusinessDetails();
   const { createproject, isPending: isCreatingProject } = useCreateProject();
@@ -74,48 +76,49 @@ const BusinessSetUp = () => {
     if (data.goal) formData.append("goal", data.goal);
     if (data.dueDate) formData.append("dueDate", data.dueDate.toString());
     if (challengeId) formData.append("challengeId", challengeId);
-    formData.append("requestSupervisor", "false");
+    formData.append("requestSupervisor", data.requestSupervisor.toString());
 
     // Append multiple files
     files.forEach((file) => {
       formData.append("files", file);
     });
 
-		if (mode === "create") {
-			createproject(formData, {
-				onSuccess: () => {
-					toast.success("Project created");
-					router.push("/workspace");
-				},
-				onError: (error) => {
-					toast.error(`${error.message}`);
-				},
-			});
-		} else {
-			createChallenge(formData, {
-				onSuccess: (res) => {
-					localStorage.setItem(
-						"challenge",
-						JSON.stringify(res?.data)
-					);
-					toast.success("Challenge analysis completed");
-					router.push("/analysis-result");
-				},
-			});
-		}
-	};
+    if (mode === "create") {
+      createproject(formData, {
+        onSuccess: () => {
+          toast.success("Project created");
+          router.push("/workspace");
+        },
+        onError: (error) => {
+          toast.error(`${error.message}`);
+        },
+      });
+    } else {
+      createChallenge(formData, {
+        onSuccess: (res) => {
+          localStorage.setItem(
+            "challenge",
+            JSON.stringify(res?.data)
+          );
+          toast.success("Challenge analysis completed");
+          router.push("/analysis-result");
+        },
+      });
+    }
+  };
 
-	useEffect(() => {
-		const lastChallenge = (challenge?.data ?? [])[
-			challenge?.data?.length - 1
-		];
+  useEffect(() => {
+    const lastChallenge = (challenge?.data ?? [])[
+      challenge?.data?.length - 1
+    ];
 
-		methods.reset({
-			...lastChallenge,
-			brief: lastChallenge?.description,
-			dueDate: lastChallenge?.start_timeline,
-		});
-	}, [challengeId]);
+    methods.reset({
+      ...lastChallenge,
+      brief: lastChallenge?.description,
+      dueDate: lastChallenge?.start_timeline,
+      requestSupervisor: false, // Reset to false when loading challenge data
+    });
+  }, [challengeId]);
 
   return (
     <div className="flex w-full flex-col gap-10">
@@ -210,52 +213,64 @@ const BusinessSetUp = () => {
                 </div>
 
                 {/* Due Date */}
-<div className="form-group flex flex-col gap-2">
-  <Label>
-    Due Date <span className="text-[#878A93]">(optional)</span>
-  </Label>
-  <Controller
-    name="dueDate"
-    control={methods.control}
-    render={({ field }) => {
-      const [open, setOpen] = useState(false);
+                <div className="form-group flex flex-col gap-2">
+                  <Label>
+                    Due Date <span className="text-[#878A93]">(optional)</span>
+                  </Label>
+                  <Controller
+                    name="dueDate"
+                    control={methods.control}
+                    render={({ field }) => {
+                      const [open, setOpen] = useState(false);
 
-      const handleSelect = (date: Date | undefined) => {
-        field.onChange(date);
-        setOpen(false); 
-      };
+                      const handleSelect = (date: Date | undefined) => {
+                        field.onChange(date);
+                        setOpen(false); 
+                      };
 
-      return (
-        <Popover open={open} onOpenChange={setOpen}>
-          <PopoverTrigger asChild>
-            <Button
-              type="button"
-              variant="outline"
-              className={cn(
-                "w-full justify-start text-left font-normal rounded-[14px] py-6 px-4 border border-[#D1DAEC]",
-                !field.value && "text-muted-foreground"
-              )}
-            >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {field.value
-                ? format(new Date(field.value), "PPP")
-                : "Select due date"}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <Calendar
-              mode="single"
-              selected={field.value ? new Date(field.value) : undefined}
-              onSelect={handleSelect}
-              initialFocus
-            />
-          </PopoverContent>
-        </Popover>
-      );
-    }}
-  />
-</div>
+                      return (
+                        <Popover open={open} onOpenChange={setOpen}>
+                          <PopoverTrigger asChild>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              className={cn(
+                                "w-full justify-start text-left font-normal rounded-[14px] py-6 px-4 border border-[#D1DAEC]",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              <CalendarIcon className="mr-2 h-4 w-4" />
+                              {field.value
+                                ? format(new Date(field.value), "PPP")
+                                : "Select due date"}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={field.value ? new Date(field.value) : undefined}
+                              onSelect={handleSelect}
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
+                      );
+                    }}
+                  />
+                </div>
 
+                {/* Request Supervisor Checkbox */}
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="requestSupervisor"
+                    {...methods.register("requestSupervisor")}
+                    className="w-4 h-4 rounded border border-[#D1DAEC]"
+                  />
+                  <Label htmlFor="requestSupervisor" className="text-sm font-normal cursor-pointer">
+                    Request Supervisor
+                  </Label>
+                </div>
 
                 {/* File upload */}
                 <div className="flex flex-col gap-2">

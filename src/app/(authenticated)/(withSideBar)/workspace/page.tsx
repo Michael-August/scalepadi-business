@@ -76,7 +76,7 @@ const WorkSpace = () => {
           <span className="text-sm text-[#727374] line-clamp-2">
             {project.brief || project.goal}
           </span>
-          <span className="text-xs text-gray-500 font-medium">
+          <span className="text-xs text-gray-500 font-medium line-clamp-2">
             Challenge: {challengeText}
           </span>
         </div>
