@@ -120,11 +120,12 @@ const BusinessSetUp = () => {
 
 		methods.reset({
 			...lastChallenge,
-			brief: `${
-				lastChallenge?.result?.bottleneck
-			}\n\n ${lastChallenge?.result.pain_points
+			brief: `${lastChallenge?.result?.bottleneck}\n
+			${lastChallenge?.result.pain_points
 				.map((p: string, i: number) => `${i + 1}. ${p}`)
-				.join("\n")}`,
+				.join("\n")}\n
+			${lastChallenge?.result?.recommendation}
+				`,
 			dueDate: lastChallenge?.start_timeline,
 			requestSupervisor: false, // Reset to false when loading challenge data
 		});
@@ -201,7 +202,7 @@ const BusinessSetUp = () => {
 											required:
 												"Problem description is required",
 										})}
-										className="rounded-[14px] py-6 px-4 border border-[#D1DAEC]"
+										className="rounded-[14px] h-60 py-6 px-4 border border-[#D1DAEC]"
 									/>
 									{methods.formState.errors.brief && (
 										<p className="text-red-500 text-sm">
