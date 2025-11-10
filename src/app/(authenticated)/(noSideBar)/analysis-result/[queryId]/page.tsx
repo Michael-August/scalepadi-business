@@ -33,6 +33,9 @@ const AnalysisResultPage = () => {
 	const [challenge, setChallenge] = useState<any | null>(null);
 
 	const [messages, setMessages] = useState<IMessage[] | null>(null);
+	const [suggestedExperts, setSuggestedExperts] = useState<any[] | null>(
+		null
+	);
 
 	const [input, setInput] = useState("");
 
@@ -201,7 +204,10 @@ const AnalysisResultPage = () => {
 							role: "assistant",
 							key: "Recommended SOPs",
 							content: challenge.result.recommended_sops
-								.map((p: string, i: number) => `${i + 1}. ${p}`)
+								.map(
+									(p: any, i: number) =>
+										`${i + 1}. ${p?.description}`
+								)
 								.join("\n"),
 						});
 					}
@@ -329,11 +335,11 @@ const AnalysisResultPage = () => {
 
 									<div className="flex flex-col gap-4 mb-5">
 										{/* <div className="flex flex-col gap-2">
-										<span className="text-sm text-[#1A1A1A]">
-											Suggested Experts
-										</span>
-										<div className="flex items-center"></div>
-									</div> */}
+											<span className="text-sm text-[#1A1A1A]">
+												Suggested Experts
+											</span>
+											<div className="flex items-center"></div>
+										</div> */}
 										<Button
 											onClick={() => {
 												router.push(
