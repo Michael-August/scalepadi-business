@@ -116,19 +116,22 @@ const BusinessSetUp = () => {
 			challenge?.data?.length - 1
 		];
 
-		setChallengeToCreateProjectFrom(lastChallenge);
+		if (lastChallenge) {
+			setChallengeToCreateProjectFrom(lastChallenge);
 
-		methods.reset({
-			...lastChallenge,
-			brief: `${lastChallenge?.result?.bottleneck}\n
-			${lastChallenge?.result.pain_points
-				.map((p: string, i: number) => `${i + 1}. ${p}`)
-				.join("\n")}\n
-			${lastChallenge?.result?.recommendation}
-				`,
-			dueDate: lastChallenge?.start_timeline,
-			requestSupervisor: false, // Reset to false when loading challenge data
-		});
+			methods.reset({
+				...lastChallenge,
+				brief:
+					`${lastChallenge?.result?.bottleneck}\n
+				${lastChallenge?.result.pain_points
+					.map((p: string, i: number) => `${i + 1}. ${p}`)
+					.join("\n")}\n
+				${lastChallenge?.result?.recommendation}
+					` || "",
+				dueDate: lastChallenge?.start_timeline,
+				requestSupervisor: false, // Reset to false when loading challenge data
+			});
+		}
 	}, [challengeId]);
 
 	return (
