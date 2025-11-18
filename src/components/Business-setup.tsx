@@ -34,6 +34,10 @@ type FormValues = {
 	brief: string;
 	goal?: string;
 	dueDate?: string | Date;
+	location: string;
+	workingPreference: string;
+	kindOfExperts: string;
+	expertsExperienceLevel: string;
 	requestSupervisor: boolean;
 };
 
@@ -47,6 +51,10 @@ const BusinessSetUp = () => {
 			brief: "",
 			goal: "",
 			dueDate: undefined,
+			location: "",
+			workingPreference: "",
+			kindOfExperts: "",
+			expertsExperienceLevel: "",
 			requestSupervisor: false,
 		},
 	});
@@ -80,7 +88,12 @@ const BusinessSetUp = () => {
 		if (data.dueDate) formData.append("dueDate", data.dueDate.toString());
 		if (challengeId)
 			formData.append("challengeId", challengeToCreateProjectFrom?.id);
+
 		formData.append("requestSupervisor", data.requestSupervisor.toString());
+		formData.append("location", data.location);
+		formData.append("kindOfExperts", data.kindOfExperts);
+		formData.append("expertsExperienceLevel", data.expertsExperienceLevel);
+		formData.append("workingPrefernce", data.workingPreference);
 
 		// Append multiple files
 		files.forEach((file) => {
@@ -302,6 +315,58 @@ const BusinessSetUp = () => {
 												</Popover>
 											);
 										}}
+									/>
+								</div>
+
+								<div className="form-group flex flex-col gap-2">
+									<Label>
+										Location{" "}
+										<span className="text-red-600">*</span>
+									</Label>
+									<Input
+										{...methods.register("location")}
+										className="rounded-[14px] py-6 px-4 border border-[#D1DAEC]"
+										type="text"
+									/>
+								</div>
+
+								<div className="form-group flex flex-col gap-2">
+									<Label>
+										Working condition or Preference{" "}
+										<span className="text-red-600">*</span>
+									</Label>
+									<Input
+										{...methods.register(
+											"workingPreference"
+										)}
+										className="rounded-[14px] py-6 px-4 border border-[#D1DAEC]"
+										type="text"
+										placeholder="Remote, On-site, Hybrid"
+									/>
+								</div>
+
+								<div className="form-group flex flex-col gap-2">
+									<Label>
+										Kind of Experts{" "}
+										<span className="text-red-600">*</span>
+									</Label>
+									<Input
+										{...methods.register("kindOfExperts")}
+										className="rounded-[14px] py-6 px-4 border border-[#D1DAEC]"
+										type="text"
+									/>
+								</div>
+								<div className="form-group flex flex-col gap-2">
+									<Label>
+										Expert Experience Level{" "}
+										<span className="text-red-600">*</span>
+									</Label>
+									<Input
+										{...methods.register(
+											"expertsExperienceLevel"
+										)}
+										className="rounded-[14px] py-6 px-4 border border-[#D1DAEC]"
+										type="text"
 									/>
 								</div>
 

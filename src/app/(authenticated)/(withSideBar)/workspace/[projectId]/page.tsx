@@ -39,6 +39,7 @@ import { noAvatar } from "@/lib/constatnts";
 import { useMakeEnquiry } from "@/hooks/usePlan";
 import { useForm } from "react-hook-form";
 import { useQueryClient } from "@tanstack/react-query";
+import ProjectDetailSkeleton from "@/components/skeletons/projectdetails.skeleton";
 
 type InquiryFormValues = {
 	firstName: string;
@@ -55,7 +56,7 @@ const ProjectDetails = () => {
 
 	const { projectId } = useParams();
 
-	const { project } = useGetProject(projectId as string);
+	const { project, isLoading } = useGetProject(projectId as string);
 	const { tasks, isLoading: isLoadingTasks } = useGetTasksForProject(
 		projectId as string
 	);
@@ -300,6 +301,8 @@ const ProjectDetails = () => {
 						{project?.data?.title || "Untitled Project"}
 					</span>
 				</div>
+
+				{isLoading && <ProjectDetailSkeleton />}
 
 				{/* Project Info Section */}
 				<div className="flex w-full items-center justify-between gap-4">
