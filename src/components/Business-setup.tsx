@@ -3,21 +3,12 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-	Select,
-	SelectContent,
-	SelectGroup,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { CalendarIcon, Plus, X } from "lucide-react";
+import { CalendarIcon, Info, Plus, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useSetBusinessDetails } from "@/hooks/useAuth";
 import { useCreateProject } from "@/hooks/useProject";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -25,7 +16,12 @@ import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { format } from "date-fns";
 import { Calendar } from "./ui/calendar";
 import { useCreateChallenge, useGetChallengeById } from "@/hooks/useChallenge";
-import { error } from "console";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from "./ui/tooltip";
 
 // ---- Define types for the form ----
 type FormValues = {
@@ -103,6 +99,7 @@ const BusinessSetUp = () => {
 		if (mode === "create") {
 			createproject(formData, {
 				onSuccess: () => {
+					localStorage.setItem("projectJustCreated", "true");
 					toast.success("Project created");
 					router.push("/workspace");
 				},
@@ -386,6 +383,20 @@ const BusinessSetUp = () => {
 									>
 										Request Supervisor
 									</Label>
+									<TooltipProvider>
+										<Tooltip>
+											<TooltipTrigger>
+												<Info className="text-gray-500" />
+											</TooltipTrigger>
+											<TooltipContent>
+												<p className="text-sm text-gray-700">
+													Checking this part let's
+													scalepadi provide you with a
+													supervisor for your project
+												</p>
+											</TooltipContent>
+										</Tooltip>
+									</TooltipProvider>
 								</div>
 
 								{/* File upload */}

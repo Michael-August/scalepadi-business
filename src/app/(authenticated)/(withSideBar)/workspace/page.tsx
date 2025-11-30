@@ -4,7 +4,13 @@ import ProjectSkeletonLoader from "@/components/skeletons/projects.skeleton";
 import { Button } from "@/components/ui/button";
 import { useGetProjects } from "@/hooks/useProject";
 import { IProject } from "@/types/project.type";
-import { Church, AlertTriangle, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+	Church,
+	AlertTriangle,
+	ChevronLeft,
+	ChevronRight,
+	X,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -25,6 +31,8 @@ const WorkSpace = () => {
 	const [page, setPage] = useState(1);
 	const { projects, isLoading } = useGetProjects(params);
 	const router = useRouter();
+
+	const [showNotification, setShowNotification] = useState(false);
 
 	const handleNext = () => {
 		if (projects?.currentPage < projects?.totalPages) {
@@ -65,6 +73,10 @@ const WorkSpace = () => {
 			setGreeting("Good evening");
 		} else {
 			setGreeting("Good night");
+		}
+
+		if (localStorage.getItem("projectJustCreated")) {
+			setShowNotification(true);
 		}
 	}, []);
 
@@ -127,6 +139,35 @@ const WorkSpace = () => {
 					{user?.name?.split(" ")[0]}
 				</span>
 			</header>
+
+			{showNotification && (
+				<div className="w-full flex gap-2 bg-[#FEF3CF47] p-5 border border-[#EFF2F3] rounded-[30px] animate-fadeIn">
+					<div className="w-1 h-[100px] rounded-[8px] bg-gradient-to-b from-[#FFA8A8] to-[#FCFF00]" />
+					<div className="flex flex-col w-full mt-2 ml-3 gap-4">
+						<div className="flex items-center justify-between">
+							<span className="font-semibold text-[#1A1A1A] text-base">
+								Your project has been created successfully.
+							</span>
+							<X
+								onClick={() => {
+									setShowNotification(false);
+									localStorage.removeItem(
+										"projectJustCreated"
+									);
+								}}
+								className="w-4 h-4 text-gray-600 cursor-pointer hover:text-gray-800 transition"
+							/>
+						</div>
+						<div className="text-sm text-[#3E4351]">
+							<p>It is currently under review.</p>
+							<p>
+								We will get back to you in 72hrs or less on the
+								next steps.
+							</p>
+						</div>
+					</div>
+				</div>
+			)}
 
 			<div className="flex flex-col gap-4">
 				<div className="flex items-center justify-between">

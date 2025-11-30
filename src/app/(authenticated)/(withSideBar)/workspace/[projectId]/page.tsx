@@ -890,6 +890,43 @@ const ProjectDetails = () => {
 											</div>
 										)}
 
+										<div className="flex items-start gap-4">
+											<div className="relative">
+												<div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-[#E2E2E2]">
+													<Image
+														src={
+															task?.assignedTo
+																?.profilePicture ||
+															noAvatar
+														}
+														alt="Expert Avatar"
+														width={64}
+														height={64}
+														className="object-cover"
+													/>
+												</div>
+												<div className="absolute -bottom-1 -right-1 bg-primary rounded-full p-1 border-2 border-white">
+													<User className="w-3 h-3 text-white" />
+												</div>
+											</div>
+
+											<div className="flex-1">
+												<div className="flex items-start justify-between">
+													<div>
+														<h3 className="text-lg font-semibold text-[#1A1A1A]">
+															{
+																task?.assignedTo
+																	?.name
+															}
+														</h3>
+														<p className="text-sm text-[#878A93] mt-1">
+															Expert Specialist
+														</p>
+													</div>
+												</div>
+											</div>
+										</div>
+
 										{/* Notes */}
 										{/* {task?.notes?.length > 0 && (
                       <div className="flex flex-col gap-2">
