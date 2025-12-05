@@ -284,6 +284,9 @@ const ProjectDetails = () => {
 	const formattedText = project?.data?.brief
 		.replace(/\\r\\n/g, "<br />")
 		.replace(/\\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;");
+	const formattedKindOfExperts = project?.data?.kindOfExperts
+		.replace(/\\r\\n/g, "<br />")
+		.replace(/\\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;");
 
 	return (
 		<div className="flex w-full flex-col gap-6">
@@ -488,6 +491,18 @@ const ProjectDetails = () => {
 							{project?.data?.challengeId?.description ||
 								"No challenge description provided."}
 						</p>
+					</div>
+
+					<div className="flex flex-col gap-2">
+						<span className="text-[#1A1A1A] text-sm font-normal">
+							Kind of Expert needed
+						</span>
+						<div
+							className="whitespace-pre-line text-sm text-[#727374] leading-relaxed"
+							dangerouslySetInnerHTML={{
+								__html: formattedKindOfExperts,
+							}}
+						/>
 					</div>
 
 					{/* Resources */}

@@ -138,6 +138,12 @@ const BusinessSetUp = () => {
 					.join("\n")}\n
 				${lastChallenge?.result?.recommendation}
 					` || "",
+				kindOfExperts:
+					`${lastChallenge?.result?.experts
+						?.map(
+							(expert: string, i: number) => `${i + 1}. ${expert}`
+						)
+						.join("\n")}` || "",
 				dueDate: lastChallenge?.start_timeline,
 				requestSupervisor: false, // Reset to false when loading challenge data
 			});
@@ -157,7 +163,7 @@ const BusinessSetUp = () => {
 						<span className="text-secondary-text text-sm lg:text-base font-medium text-center">
 							{comingFromExpert
 								? `This will help ${expertName} better understand your needs`
-								: "Tell us your biggest business challenge we'll analyze it and build a solution."}
+								: "Tell us your biggest business challenge we will analyze it and build a solution."}
 						</span>
 					</div>
 
@@ -347,10 +353,9 @@ const BusinessSetUp = () => {
 										Kind of Experts{" "}
 										<span className="text-red-600">*</span>
 									</Label>
-									<Input
+									<Textarea
 										{...methods.register("kindOfExperts")}
 										className="rounded-[14px] py-6 px-4 border border-[#D1DAEC]"
-										type="text"
 									/>
 								</div>
 								<div className="form-group flex flex-col gap-2">

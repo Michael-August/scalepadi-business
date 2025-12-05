@@ -20,6 +20,8 @@ import { v4 as uuidv4 } from "uuid";
 import { Suspense, useEffect, useState } from "react";
 import Image from "next/image";
 import axios from "axios";
+import SingleSelectField from "@/components/searchableSingleSelectInput";
+import { problemTypes } from "@/lib/constatnts";
 
 type FormValues = {
 	type: string;
@@ -150,8 +152,8 @@ const AiBusinessQuery = () => {
 							What's Your Business Challenge
 						</span>
 						<span className="text-secondary-text text-sm lg:text-base font-medium text-center">
-							Tell us your biggest business challenge, we’ll
-							analyze it and build a solution.
+							Tell scalepadi AI your biggest business challenge it
+							will analyze it and build a solution.
 						</span>
 					</div>
 
@@ -162,16 +164,13 @@ const AiBusinessQuery = () => {
 								onSubmit={methods.handleSubmit(onSubmit)}
 							>
 								{/* Type */}
-								<div className="form-group flex flex-col gap-2">
-									<Label>Type</Label>
-									<Input
-										{...methods.register("type", {
-											required: true,
-										})}
-										className="rounded-[14px] py-6 px-4 border border-[#D1DAEC]"
-										placeholder="Visibility, Growth, etc."
-									/>
-								</div>
+								<SingleSelectField
+									name="type"
+									label="Type"
+									options={problemTypes}
+									placeholder="Select Challenge type"
+									rules={{ required: "Type is required" }}
+								/>
 
 								{/* Description */}
 								<div className="form-group flex flex-col gap-2">
