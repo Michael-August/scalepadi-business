@@ -234,7 +234,9 @@ const ProjectDetails = () => {
 		email: user?.email,
 		amount:
 			project?.data?.totalCost &&
-			parseFloat(project?.data?.totalCost) * 100,
+			parseFloat(
+				project?.data?.totalCost + project?.data?.serviceCharge
+			) * 100,
 		publicKey,
 		text: "Make Payment",
 		metadata: {
@@ -395,7 +397,11 @@ const ProjectDetails = () => {
 							Proposed Price:
 						</span>
 						<span className="text-lg font-bold text-green-700">
-							₦{project?.data?.totalCost?.toLocaleString()}
+							₦
+							{(
+								project?.data?.totalCost +
+								project?.data?.serviceCharge
+							)?.toLocaleString()}
 						</span>
 					</div>
 					<PaystackButton
@@ -410,7 +416,11 @@ const ProjectDetails = () => {
 							Total cost so far:
 						</span>
 						<span className="text-lg font-bold text-green-700">
-							₦{project?.data?.totalCost?.toLocaleString() || 0}
+							₦
+							{(
+								project?.data?.totalCost +
+								project?.data?.serviceCharge
+							)?.toLocaleString() || 0}
 						</span>
 					</div>
 					<span className="text-xs text-gray-500">

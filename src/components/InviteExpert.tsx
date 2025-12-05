@@ -64,9 +64,9 @@ const InviteExpert = ({
 				<div className="p-4">
 					<div className="top flex flex-col gap-4 mb-4 w-full">
 						<span className="text-primary-text font-bold lg:text-base text-sm">
-							Share some details about this project
+							Share some details about this job
 						</span>
-						<span className="text-secondary-text text-xs font-medium">{`This will help ${expertName} better understand your needs`}</span>
+						<span className="text-secondary-text text-xs font-medium">{`This will help ${expertName} better understand the job`}</span>
 					</div>
 
 					<div className="w-full">
@@ -77,13 +77,13 @@ const InviteExpert = ({
 							>
 								<div className="form-group flex flex-col gap-2">
 									<Label>
-										Describe the problem{" "}
+										Provide the job description{" "}
 										<span className="text-red-600">*</span>
 									</Label>
 									<Textarea
 										{...methods.register("description", {
 											required:
-												"Problem description is required",
+												"Job description is required",
 										})}
 										className="rounded-[14px] py-6 px-4 border border-[#D1DAEC]"
 									/>
@@ -111,11 +111,11 @@ const InviteExpert = ({
 									/>
 								</div>
 								<div className="form-group flex flex-col gap-2">
-									<Label>Budget</Label>
+									<Label>Salary</Label>
 									<Input
 										{...methods.register("budget")}
 										className="rounded-[14px] py-6 px-4 border border-[#D1DAEC]"
-										placeholder="Enter project budget"
+										placeholder="Enter salary"
 										type="number"
 									/>
 								</div>
