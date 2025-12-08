@@ -387,7 +387,6 @@ const ProjectDetails = () => {
 			{project?.data?.totalCost &&
 			(project?.data?.paymentStatus === "pending" ||
 				project?.data?.paymentStatus === "cancelled") &&
-			tasks?.data?.every((task: any) => task.status === "assigned") &&
 			project?.data?.experts?.every(
 				(expert: any) => expert?.status === "accepted"
 			) ? (
