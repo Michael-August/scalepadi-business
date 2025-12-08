@@ -439,7 +439,10 @@ const ProjectDetails = () => {
 					<CheckCircle className="w-5 h-5 text-green-600" />
 					<span className="text-sm font-medium text-green-700">
 						Payment Completed • Paid ₦
-						{project?.data?.totalCost?.toLocaleString()}
+						{(
+							project?.data?.totalCost +
+							project?.data?.serviceCharge
+						)?.toLocaleString() || 0}
 					</span>
 				</div>
 			)}
