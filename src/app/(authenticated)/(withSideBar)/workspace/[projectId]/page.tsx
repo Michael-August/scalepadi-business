@@ -462,7 +462,7 @@ const ProjectDetails = () => {
 				{[
 					{ id: "projectOverview", label: "Project Overview" },
 					{ id: "taskTracker", label: "Task Tracker" },
-					{ id: "team", label: "Team Members" },
+					// { id: "team", label: "Team Members" },
 					// { id: "deliverables", label: "Deliverables" },
 				].map((tab) => (
 					<button
@@ -564,7 +564,7 @@ const ProjectDetails = () => {
 				</div>
 			)}
 
-			{activeTab === "team" && (
+			{/* {activeTab === "team" && (
 				<div className="w-full border border-[#F2F2F2] rounded-2xl p-6">
 					<h3 className="text-[#1A1A1A] text-base font-semibold mb-4">
 						Team Members
@@ -608,7 +608,7 @@ const ProjectDetails = () => {
 						)}
 					</div>
 				</div>
-			)}
+			)} */}
 
 			{activeTab === "taskTracker" && (
 				<div className="w-full border border-[#F2F2F2] rounded-2xl p-6 flex flex-col gap-6">
