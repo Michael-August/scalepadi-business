@@ -141,6 +141,17 @@ const ProjectDetails = () => {
 		selectedExpert?.id?.id || ""
 	);
 
+	const getAvatarUrl = (name?: string) => {
+		if (name) {
+			return `https://ui-avatars.com/api/?name=${encodeURIComponent(
+				name
+			)}&background=random&size=128`;
+		}
+		return `https://i.pravatar.cc/128?img=${Math.floor(
+			Math.random() * 70
+		)}`;
+	};
+
 	const handleStatusUpdate = (
 		status: "approved" | "needs-changes",
 		note: string,
@@ -630,85 +641,77 @@ const ProjectDetails = () => {
 									{project.data.experts.map(
 										(expert: any, index: number) => (
 											<div
+												onClick={() => {
+													if (project?.data?.paidOn) {
+														router.push(
+															`/experts/${expert?.id?.id}`
+														);
+													}
+												}}
 												key={index}
-												className="flex flex-col border border-[#F3F4F6] rounded-2xl p-6 bg-white hover:shadow-lg transition-all duration-300"
+												className="flex cursor-pointer flex-col border border-[#F3F4F6] rounded-2xl p-6 bg-white hover:shadow-lg transition-all duration-300"
 											>
-												<div className="flex items-start gap-4">
-													<div className="relative">
+												<div className="bg-[#FBFCFC] p-4 flex flex-col justify-between gap-4 rounded-3xl">
+													<div className="flex items-center gap-2">
 														<div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-[#E2E2E2]">
 															<Image
 																src={
-																	expert?.profilePicture ||
-																	noAvatar
-																}
-																alt="Expert Avatar"
-																width={64}
-																height={64}
-																className="object-cover"
-															/>
-														</div>
-														<div className="absolute -bottom-1 -right-1 bg-primary rounded-full p-1 border-2 border-white">
-															<User className="w-3 h-3 text-white" />
-														</div>
-													</div>
-
-													<div className="flex-1">
-														<div className="flex items-start justify-between">
-															<div>
-																<h3 className="text-lg font-semibold text-[#1A1A1A]">
-																	{
+																	expert?.id
+																		?.avatar ||
+																	getAvatarUrl(
 																		expert
 																			?.id
-																			?.name
-																	}
-																</h3>
-																<p className="text-sm text-[#878A93] mt-1">
-																	Expert
-																	Specialist
-																</p>
-															</div>
-															<div className="flex items-center gap-1 bg-[#F8F9FA] px-2 py-1 rounded-full">
-																<Star className="w-3 h-3 text-[#F2BB05] fill-[#F6CF50]" />
-																<span className="text-xs font-medium text-[#1A1A1A]">
-																	{expertReview
-																		?.data
-																		?.averageScore ||
-																		"0.0"}
-																</span>
-															</div>
+																			.name
+																	)
+																}
+																alt={`${expert?.id.name}'s profile`}
+																width={64}
+																height={64}
+																className="w-16 h-16 rounded-full object-cover"
+															/>
 														</div>
-
-														<div className="flex items-center gap-4 mt-3 text-xs text-[#878A93]">
-															<div className="flex items-center gap-1">
-																<MessageCircle className="w-3 h-3" />
-																<span>
-																	{expertReview
-																		?.data
-																		?.totalRatings ||
-																		0}{" "}
-																	reviews
-																</span>
-															</div>
-															<div className="flex items-center gap-1">
-																<Calendar className="w-3 h-3" />
-																<span>
-																	Joined{" "}
-																	{moment(
-																		expert?.createdAt
-																	).format(
-																		"MMM YYYY"
+														<span className="text-[#1A1A1A] font-medium text-base">
+															{expert?.id
+																?.role[0] ||
+																"Expert"}
+														</span>
+													</div>
+													<div className="flex-1">
+														<div className="p-4 flex flex-col gap-2 border border-[#D1DAEC80] rounded-[14px]">
+															<div className="gap-3 flex flex-col">
+																{/* Tags */}
+																<div className="flex items-center gap-1 flex-wrap">
+																	{expert?.id.skills?.map(
+																		(
+																			skill: string,
+																			index: number
+																		) => (
+																			<span
+																				key={
+																					index
+																				}
+																				className="bg-[#F2F7FF] p-2 rounded-[14px] text-[10px] text-[#1E88E5] capitalize"
+																			>
+																				{
+																					skill
+																				}
+																			</span>
+																		)
 																	)}
-																</span>
+																</div>
 															</div>
 														</div>
 
 														<div className="mt-4">
 															<Button
-																onClick={() =>
+																onClick={(
+																	e
+																) => {
+																	e.stopPropagation();
 																	handleOpenExpertReview(
 																		expert
-																	)
-																}
+																	);
+																}}
 																className="w-full bg-gradient-to-r from-primary to-primary/80 text-white rounded-xl py-3 hover:from-primary/90 hover:to-primary/70 transition-all duration-300 shadow-md"
 															>
 																<Star className="w-4 h-4 mr-2" />
@@ -923,13 +926,16 @@ const ProjectDetails = () => {
 													<Image
 														src={
 															task?.assignedTo
-																?.profilePicture ||
-															noAvatar
+																?.avatar ||
+															getAvatarUrl(
+																task?.assignedTo
+																	.name
+															)
 														}
-														alt="Expert Avatar"
+														alt={`${task?.assignedTo.name}'s profile`}
 														width={64}
 														height={64}
-														className="object-cover"
+														className="w-16 h-16 rounded-full object-cover"
 													/>
 												</div>
 												<div className="absolute -bottom-1 -right-1 bg-primary rounded-full p-1 border-2 border-white">
@@ -941,14 +947,32 @@ const ProjectDetails = () => {
 												<div className="flex items-start justify-between">
 													<div>
 														<h3 className="text-lg font-semibold text-[#1A1A1A]">
-															{
-																task?.assignedTo
-																	?.name
-															}
+															{task?.assignedTo
+																.role?.[0] ||
+																"Expert"}
 														</h3>
-														<p className="text-sm text-[#878A93] mt-1">
-															Expert Specialist
-														</p>
+														<div className="gap-3 flex flex-col">
+															{/* Tags */}
+															<div className="flex items-center gap-1 flex-wrap">
+																{task?.assignedTo.skills?.map(
+																	(
+																		skill: string,
+																		index: number
+																	) => (
+																		<span
+																			key={
+																				index
+																			}
+																			className="bg-[#F2F7FF] p-2 rounded-[14px] text-[10px] text-[#1E88E5] capitalize"
+																		>
+																			{
+																				skill
+																			}
+																		</span>
+																	)
+																)}
+															</div>
+														</div>
 													</div>
 												</div>
 											</div>

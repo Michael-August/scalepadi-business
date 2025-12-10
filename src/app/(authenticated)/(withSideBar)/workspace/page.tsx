@@ -185,6 +185,12 @@ const WorkSpace = () => {
 						>
 							Start a new project
 						</Button>
+						<Button
+							onClick={() => router.push("/experts")}
+							className="text-white bg-primary rounded-[14px] hover:bg-primary-hover hover:text-black"
+						>
+							Hire an expert
+						</Button>
 						<button
 							onClick={() => {
 								// localStorage.setItem("projectId", project?.id);

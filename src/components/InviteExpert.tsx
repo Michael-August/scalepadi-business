@@ -127,7 +127,7 @@ const InviteExpert = ({
 								>
 									{isPending || isPending
 										? "Submitting..."
-										: "Submit & Invite"}
+										: "Submit & hire"}
 								</Button>
 							</form>
 						</FormProvider>

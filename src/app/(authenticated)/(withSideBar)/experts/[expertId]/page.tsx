@@ -180,7 +180,7 @@ const ExpertDetails = () => {
 								onClick={() => setOpenSheet(true)}
 								className="text-sm text-white rounded-[14px] hover:bg-primary-hover hover:text-black"
 							>
-								Invite expert
+								Hire expert
 							</Button>
 						</div>
 
