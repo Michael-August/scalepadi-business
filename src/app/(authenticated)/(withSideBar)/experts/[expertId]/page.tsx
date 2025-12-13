@@ -9,13 +9,23 @@ import { useExpertReview } from "@/hooks/useReview";
 import { noAvatar } from "@/lib/constatnts";
 import { Dot, Star, Verified, X } from "lucide-react";
 import Image from "next/image";
-import { useParams, useRouter } from "next/navigation";
-import { useState, useMemo } from "react";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useState, useMemo, Suspense } from "react";
+
+const Page = () => {
+	return (
+		<Suspense fallback={"Loading"}>
+			<ExpertDetails />
+		</Suspense>
+	);
+};
 
 const ExpertDetails = () => {
 	const [activeTab, setActiveTab] = useState<"about" | "review">("about");
 	const { expertId } = useParams();
 	const router = useRouter();
+
+	const searchParams = useSearchParams();
 
 	const { expert, isLoading } = useGetExpert(expertId as string);
 	const { review: expertReview, isLoading: reviewLoading } = useExpertReview(
@@ -176,12 +186,14 @@ const ExpertDetails = () => {
 									</div>
 								</div>
 							</div>
-							<Button
-								onClick={() => setOpenSheet(true)}
-								className="text-sm text-white rounded-[14px] hover:bg-primary-hover hover:text-black"
-							>
-								Hire expert
-							</Button>
+							{!searchParams.get("route") && (
+								<Button
+									onClick={() => setOpenSheet(true)}
+									className="text-sm text-white rounded-[14px] hover:bg-primary-hover hover:text-black"
+								>
+									Hire expert
+								</Button>
+							)}
 						</div>
 
 						{/* Tabs Section */}
@@ -466,4 +478,4 @@ const ExpertDetails = () => {
 	);
 };
 
-export default ExpertDetails;
+export default Page;

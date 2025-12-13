@@ -642,11 +642,9 @@ const ProjectDetails = () => {
 										(expert: any, index: number) => (
 											<div
 												onClick={() => {
-													if (project?.data?.paidOn) {
-														router.push(
-															`/experts/${expert?.id?.id}`
-														);
-													}
+													router.push(
+														`/experts/${expert?.id?.id}?route=project`
+													);
 												}}
 												key={index}
 												className="flex cursor-pointer flex-col border border-[#F3F4F6] rounded-2xl p-6 bg-white hover:shadow-lg transition-all duration-300"

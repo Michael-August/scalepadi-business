@@ -22,6 +22,7 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from "./ui/tooltip";
+import SingleSelectField from "./searchableSingleSelectInput";
 
 // ---- Define types for the form ----
 type FormValues = {
@@ -358,19 +359,19 @@ const BusinessSetUp = () => {
 										className="rounded-[14px] py-6 px-4 border border-[#D1DAEC]"
 									/>
 								</div>
-								<div className="form-group flex flex-col gap-2">
-									<Label>
-										Expert Experience Level{" "}
-										<span className="text-red-600">*</span>
-									</Label>
-									<Input
-										{...methods.register(
-											"expertsExperienceLevel"
-										)}
-										className="rounded-[14px] py-6 px-4 border border-[#D1DAEC]"
-										type="text"
-									/>
-								</div>
+								<SingleSelectField
+									name="expertsExperienceLevel"
+									label="Expert Experience Level"
+									options={[
+										"Entry level",
+										"Mid-level",
+										"Senior level",
+									]}
+									placeholder="Select preferred expert level "
+									rules={{
+										required: "Expert level is required",
+									}}
+								/>
 
 								{/* Request Supervisor Checkbox */}
 								<div className="flex items-center gap-2">

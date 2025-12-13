@@ -283,14 +283,13 @@ const AiBusinessQuery = () => {
 								</div>
 
 								{/* Industry */}
-								<div className="form-group flex flex-col gap-2">
-									<Label>Industry</Label>
-									<Input
-										{...methods.register("industry")}
-										className="rounded-[14px] py-6 px-4 border border-[#D1DAEC]"
-										placeholder="Marketing, Finance, etc."
-									/>
-								</div>
+								<SingleSelectField
+									name="industry"
+									label="Industry"
+									options={problemTypes}
+									placeholder="Select Industry"
+									rules={{ required: "Industry is required" }}
+								/>
 
 								{/* Revenue Range */}
 								<div className="form-group flex flex-col gap-2">
