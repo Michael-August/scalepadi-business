@@ -152,7 +152,7 @@ const ExpertDetails = () => {
 								</div>
 								<div className="flex flex-col gap-2">
 									<span className="text-[#1A1A1A] font-medium text-[20px]">
-										{expert?.name || "Expert"}
+										{expert?.role?.[0] || "Expert"}
 									</span>
 									<div className="flex items-center gap-2">
 										{expert?.verified ? (
