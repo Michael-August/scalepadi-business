@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { CalendarIcon, Loader, Check } from "lucide-react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useRouter, useSearchParams } from "next/navigation";
-import { cn } from "@/lib/utils";
+import { cn, preferredIndustries } from "@/lib/utils";
 import {
 	Popover,
 	PopoverContent,
@@ -286,7 +286,7 @@ const AiBusinessQuery = () => {
 								<SingleSelectField
 									name="industry"
 									label="Industry"
-									options={problemTypes}
+									options={preferredIndustries}
 									placeholder="Select Industry"
 									rules={{ required: "Industry is required" }}
 								/>
