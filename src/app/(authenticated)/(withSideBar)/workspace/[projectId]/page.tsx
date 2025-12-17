@@ -642,6 +642,12 @@ const ProjectDetails = () => {
 										(expert: any, index: number) => (
 											<div
 												onClick={() => {
+													if (project?.data?.paidOn) {
+														router.push(
+															`/experts/${expert?.id?.id}?route=project&paid=true`
+														);
+														return;
+													}
 													router.push(
 														`/experts/${expert?.id?.id}?route=project`
 													);

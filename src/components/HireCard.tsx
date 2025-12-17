@@ -129,18 +129,37 @@ export function HireCard({ hire }: { hire: Hire }) {
 					<div className="flex items-start gap-4">
 						<div className="flex-1">
 							<div className="flex items-center gap-3 mb-2">
-								<h3 className="font-semibold text-lg text-foreground">
-									{hire.expertId.name}
-								</h3>
+								<p className="text-muted-foreground mb-3 text-balance">
+									{hire.description}
+								</p>
 								<Badge
 									className={getStatusColor(hire.hireStatus)}
 								>
 									{hire.hireStatus}
 								</Badge>
 							</div>
-							<p className="text-muted-foreground mb-3 text-balance">
-								{hire.description}
-							</p>
+
+							{hire.businessStatus === "paid" && (
+								<div className="flex flex-col gap-2 mb-3">
+									<h3 className="font-semibold text-lg text-foreground">
+										Expert details
+									</h3>
+
+									<div className="flex items-center gap-2">
+										<span>Name:</span>
+										<p className="font-semibold text-base text-foreground">
+											{hire.expertId.name}
+										</p>
+									</div>
+									<div className="flex items-center gap-2">
+										<span>Email:</span>
+										<p className="font-semibold text-base text-foreground">
+											{hire.expertId.email}
+										</p>
+									</div>
+								</div>
+							)}
+
 							<div className="flex items-center gap-6 text-sm text-muted-foreground">
 								<div className="flex items-center gap-1">
 									<Calendar className="h-4 w-4" />
@@ -171,7 +190,7 @@ export function HireCard({ hire }: { hire: Hire }) {
 										</span>
 										<Badge
 											variant="outline"
-											className="text-xs"
+											className="text-xs capitalize"
 										>
 											{hire.businessStatus}
 										</Badge>
@@ -182,7 +201,7 @@ export function HireCard({ hire }: { hire: Hire }) {
 										</span>
 										<Badge
 											variant="outline"
-											className="text-xs"
+											className="text-xs capitalize"
 										>
 											{hire.expertStatus}
 										</Badge>

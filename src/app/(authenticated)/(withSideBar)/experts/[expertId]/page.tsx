@@ -151,9 +151,16 @@ const ExpertDetails = () => {
 									/>
 								</div>
 								<div className="flex flex-col gap-2">
-									<span className="text-[#1A1A1A] font-medium text-[20px]">
-										{expert?.role?.[0] || "Expert"}
-									</span>
+									{!searchParams.get("paid") && (
+										<span className="text-[#1A1A1A] font-medium text-[20px]">
+											{expert?.role?.[0] || "Expert"}
+										</span>
+									)}
+									{searchParams.get("paid") && (
+										<span className="text-[#1A1A1A] font-medium text-[20px]">
+											{expert?.name || "Expert"}
+										</span>
+									)}
 									<div className="flex items-center gap-2">
 										{expert?.verified ? (
 											<span className="flex items-center gap-[2px] font-medium text-[#878A93] text-sm">
@@ -167,6 +174,11 @@ const ExpertDetails = () => {
 												{expert?.role?.[0] || "Expert"}
 											</span>
 										)}
+									</div>
+									<div className="flex items-center gap-2">
+										<span className="flex items-center gap-[2px] font-medium text-[#878A93] text-sm">
+											{expert?.email}
+										</span>
 									</div>
 									<div className="flex items-center gap-1">
 										<Star className="w-[13.33px] h-[13.33px] text-[#F2BB05] fill-[#F6CF50]" />
