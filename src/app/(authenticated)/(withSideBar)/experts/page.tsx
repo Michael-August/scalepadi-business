@@ -234,9 +234,9 @@ const Experts = () => {
 										<SelectItem value="rating">
 											By rating
 										</SelectItem>
-										<SelectItem value="duration">
+										{/* <SelectItem value="duration">
 											By duration
-										</SelectItem>
+										</SelectItem> */}
 									</SelectGroup>
 								</SelectContent>
 							</Select>

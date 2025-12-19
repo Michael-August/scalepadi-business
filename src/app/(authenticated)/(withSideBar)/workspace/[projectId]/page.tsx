@@ -427,10 +427,10 @@ const ProjectDetails = () => {
 						</span>
 						<span className="text-lg font-bold text-green-700">
 							₦
-							{(project?.data?.totalCost
-								? project?.data?.totalCost
-								: 0 + project?.data?.serviceCharge
-							)?.toLocaleString() || 0}
+							{(
+								(project?.data?.totalCost ?? 0) +
+								(project?.data?.serviceCharge ?? 0)
+							).toLocaleString() || 0}
 						</span>
 					</div>
 					<span className="text-xs text-gray-500">
