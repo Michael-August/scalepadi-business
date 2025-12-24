@@ -439,7 +439,7 @@ const ProjectDetails = () => {
 					</span>
 					<span className="text-xs text-gray-500">
 						You will be prompted to pay when tasks are assigned and
-						experts has accepted
+						experts have accepted
 					</span>
 				</div>
 			)}

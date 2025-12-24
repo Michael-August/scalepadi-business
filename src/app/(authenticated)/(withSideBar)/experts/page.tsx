@@ -49,10 +49,12 @@ const Experts = () => {
 	const [page, setPage] = useState(1);
 	const [search, setSearch] = useState("");
 	const [filter, setFilter] = useState("");
+	const [yearsOfExperience, setYearsOfExperience] = useState("");
 	type ExpertParams = {
 		page: number;
 		limit: number;
 		filter?: string;
+		yearsOfExperience?: string;
 		search?: string;
 	};
 
@@ -84,7 +86,15 @@ const Experts = () => {
 		setParams((prev) => ({
 			...prev,
 			filter: value || undefined,
-			page: 1, // reset pagination on filter change
+			page: 1,
+		}));
+	};
+	const handleYearsofExperience = (value: string) => {
+		setYearsOfExperience(value);
+		setParams((prev) => ({
+			...prev,
+			yearsOfExperience: value || undefined,
+			page: 1,
 		}));
 	};
 
@@ -240,11 +250,29 @@ const Experts = () => {
 									</SelectGroup>
 								</SelectContent>
 							</Select>
+							<Select
+								value={yearsOfExperience}
+								onValueChange={handleYearsofExperience}
+							>
+								<SelectTrigger className="w-fit rounded-[10px] h-9 border border-[#D1DAEC]">
+									<SelectValue placeholder="Years of Experience" />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectGroup>
+										<SelectItem value="rating">
+											By rating
+										</SelectItem>
+										{/* <SelectItem value="duration">
+											By duration
+										</SelectItem> */}
+									</SelectGroup>
+								</SelectContent>
+							</Select>
 							<div className="rounded-[10px] p-2 flex items-center h-9 gap-2 border border-[#D8DFE2]">
 								<Search className="w-3 h-3" />
 								<Input
 									className="border-0 bg-transparent !h-9 p-0"
-									placeholder="search"
+									placeholder="search by roles or skills"
 									value={search}
 									onChange={(e) => setSearch(e.target.value)}
 								/>

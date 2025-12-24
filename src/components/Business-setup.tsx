@@ -396,9 +396,11 @@ const BusinessSetUp = () => {
 											</TooltipTrigger>
 											<TooltipContent>
 												<p className="text-sm text-gray-700">
-													Checking this part let's
-													scalepadi provide you with a
-													supervisor for your project
+													A supervisor is a dedicated
+													Growth engineer from
+													ScalePadi that manages your
+													project ensuring Quality
+													delivery by experts.
 												</p>
 											</TooltipContent>
 										</Tooltip>
